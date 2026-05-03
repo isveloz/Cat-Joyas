@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envíos y Despachos | Cat Joyas</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+    <style>
+        .policy-container { max-width: 800px; margin: 0 auto; }
+        .policy-content h2 { font-size: 2.2rem; margin-bottom: 30px; text-align: center; }
+        .policy-block { margin-bottom: 40px; background: #fff; border: 1px solid #eee; padding: 40px; }
+        .policy-block h3 { font-family: 'Lato', sans-serif; font-size: 1.1rem; text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid #000; padding-bottom: 10px; display: inline-block; }
+        .policy-block p { line-height: 1.8; color: #555; margin-bottom: 15px; }
+        .policy-block ul { line-height: 1.8; color: #555; padding-left: 20px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container header-layout">
+            <nav class="header-nav nav-left">
+                <ul class="menu-list">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="catalogo.html">Catálogo</a></li>
+                    <li><a href="nosotros.html">La Marca</a></li>
+                </ul>
+            </nav>
+            <div class="brand-center">
+                <a href="index.html" class="logo-link">
+                    <h1 class="logo-title">CAT JOYAS</h1>
+                    <span class="logo-subtitle">SANTIAGO DE CHILE</span>
+                </a>
+            </div>
+            <nav class="header-nav nav-right">
+                <ul class="menu-list">
+                    <li><a href="envio.html" class="active">Envíos</a></li>
+                    <li><a href="contacto.html">Contacto</a></li>
+                    <li><a href="carrito.html" class="cart-btn" id="header-cart-count">BOLSA (0)</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container section-spacing policy-container">
+        <div class="policy-content fade-in visible">
+            <h2>Políticas de Despacho</h2>
+            
+            <div class="policy-block">
+                <h3>Cobertura y Couriers</h3>
+                <p>En Cat Joyas garantizamos que sus piezas llegarán de forma segura a sus manos. Operamos en todo el territorio continental chileno a través de nuestros partners logísticos certificados: <strong>Bluexpress y Chilexpress</strong>.</p>
+                <p>El costo exacto del envío se calcula automáticamente en la pantalla de pago al ingresar su comuna.</p>
+            </div>
+
+            <div class="policy-block">
+                <h3>Tiempos de Entrega</h3>
+                <p>Nuestras joyas requieren un embalaje meticuloso para asegurar su protección durante el trayecto.</p>
+                <ul>
+                    <li><strong>Región Metropolitana:</strong> 2 a 3 días hábiles desde la confirmación del pago.</li>
+                    <li><strong>Regiones:</strong> 3 a 5 días hábiles, dependiendo de la lejanía de la comuna.</li>
+                    <li><strong>Zonas Extremas:</strong> Hasta 8 días hábiles.</li>
+                </ul>
+                <p><em>*Las joyas personalizadas o a medida tienen un tiempo de forja en taller de 10 a 15 días hábiles previo al despacho.</em></p>
+            </div>
+
+            <div class="policy-block">
+                <h3>Seguridad y Seguimiento</h3>
+                <p>Todas nuestras piezas viajan en empaques discretos para prevenir extravíos. Al momento de despachar su pedido, le enviaremos un correo electrónico con el número de seguimiento (Tracking) para que pueda monitorear la ruta de su joya en tiempo real.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-bottom">
+            <div class="container bottom-bar">
+                <p>&copy; 2026 CAT JOYAS. LOGÍSTICA ASEGURADA.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cartCountEl = document.getElementById('header-cart-count');
+            let carrito = JSON.parse(localStorage.getItem('catjoyas_cart')) || [];
+            cartCountEl.innerText = `BOLSA (${carrito.length})`;
+        });
+    </script>
+</body>
+</html>

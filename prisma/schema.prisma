@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// ==========================================
+// 1. MODELO DE PRODUCTOS (El Catálogo)
+// ==========================================
+model Product {
+  id          String   @id @default(uuid())
+  sku         String   @unique
+  name        String
+  description String
+  material    String   
+  price       Int      
+  stock       Int      @default(0)
+  imageUrl    String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  orderItems  OrderItem[]
+}
+
+// ==========================================
+// 2. MODELO DE CLIENTES
+// ==========================================
+model Customer {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  firstName String
+  lastName  String
+  phone     String?
+  rut       String?
+  orders    Order[]
+  createdAt DateTime @default(now())
+}
+
+// ==========================================
+// 3. MODELO DE ÓRDENES (Pagos y Envíos)
+// ==========================================
+model Order {
+  id              String   @id @default(uuid())
+  orderNumber     String   @unique 
+  totalAmount     Int      
+  status          String   @default("PENDING") 
+  tbkToken        String?  @unique
+  tbkAuthCode     String?
+  shippingAddress String
+  shippingCity    String
+  trackingCode    String?  
+  customerId      String
+  customer        Customer @relation(fields: [customerId], references: [id])
+  items           OrderItem[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ==========================================
+// 4. DETALLE DE LA ORDEN
+// ==========================================
+model OrderItem {
+  id        String  @id @default(uuid())
+  quantity  Int
+  priceAt   Int     
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+}

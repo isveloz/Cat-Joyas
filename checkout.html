@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Cat Joyas</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+    <style>
+        .checkout-grid { display: grid; grid-template-columns: 3fr 2fr; gap: 40px; margin-top: 20px; }
+        .checkout-form { padding: 30px; background: #fafafa; border: 1px solid #eee; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; font-family: 'Lato', sans-serif; }
+        .order-summary { padding: 30px; background: #fff; border: 1px solid #000; height: fit-content; position: sticky; top: 100px; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 0.95rem; }
+        .summary-total { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 2px solid #000; font-weight: 700; font-size: 1.2rem; }
+        .btn-pay { width: 100%; padding: 15px; background: #000; color: #fff; text-transform: uppercase; border: none; font-weight: 700; margin-top: 30px; cursor: pointer; transition: background 0.3s;}
+        .btn-pay:hover { background: #333; }
+        .loader-text { font-size: 0.8rem; color: #666; font-style: italic; display: none; }
+        
+        /* Lista de items en el carrito */
+        .cart-item-list { border-bottom: 1px solid #eee; margin-bottom: 20px; padding-bottom: 10px; }
+        .cart-item { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .cart-item img { width: 50px; height: 50px; object-fit: contain; border: 1px solid #eee; background: #fff; }
+        .cart-item-info { flex-grow: 1; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+        .btn-remove { background: none; border: none; color: #999; cursor: pointer; text-decoration: underline; font-size: 0.8rem; padding: 0;}
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container header-layout">
+            <nav class="header-nav nav-left"><a href="catalogo.html" style="font-size: 0.85rem; text-transform: uppercase;">&larr; Volver al catálogo</a></nav>
+            <div class="brand-center">
+                <a href="index.html" class="logo-link">
+                    <h1 class="logo-title">CAT JOYAS</h1>
+                    <span class="logo-subtitle">PAGO SEGURO</span>
+                </a>
+            </div>
+            <nav class="header-nav nav-right"></nav>
+        </div>
+    </header>
+
+    <main class="container section-spacing">
+        <h2>Finalizar Pedido</h2>
+        
+        <div class="checkout-grid">
+            <div class="checkout-form">
+                <h3>Datos de Envío</h3>
+                <form id="form-pago" onsubmit="event.preventDefault(); alert('Conectando a Transbank...');">
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" id="nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="apellido">Apellido</label>
+                            <input type="text" id="apellido" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="direccion">Dirección exacta</label>
+                        <input type="text" id="direccion" placeholder="Calle, Número, Depto" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="comuna">Comuna <span id="loading-quote" class="loader-text">Cotizando en línea...</span></label>
+                        <input type="text" id="comuna" placeholder="Ej: Las Condes, Valdivia..." required>
+                    </div>
+                </form>
+            </div>
+
+            <div class="order-summary">
+                <h3 style="margin-bottom: 20px;">Resumen del Pedido</h3>
+                
+                <div class="cart-item-list" id="lista-carrito">
+                    </div>
+                
+                <div class="summary-row">
+                    <span id="label-subtotal">Subtotal (0 items)</span>
+                    <span id="subtotal-pedido">$0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Despacho a Domicilio</span>
+                    <span id="costo-envio">Por calcular</span>
+                </div>
+                
+                <div class="summary-total">
+                    <span>Total a Pagar</span>
+                    <span id="total-pedido">$0</span>
+                </div>
+
+                <button class="btn-pay" form="form-pago">Ir a Pagar con Webpay</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer" style="margin-top: 40px;">
+        <div class="footer-bottom">
+            <div class="container bottom-bar">
+                <p>&copy; 2026 CAT JOYAS. TRANSACCIÓN ENCRIPTADA.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputComuna = document.getElementById('comuna'); 
+            const spanCostoEnvio = document.getElementById('costo-envio'); 
+            const spanTotalPedido = document.getElementById('total-pedido'); 
+            const spanSubtotal = document.getElementById('subtotal-pedido');
+            const labelSubtotal = document.getElementById('label-subtotal');
+            const listaCarrito = document.getElementById('lista-carrito');
+            const loader = document.getElementById('loading-quote');
+            
+            let carrito = JSON.parse(localStorage.getItem('catjoyas_cart')) || [];
+            let subtotalGlobal = 0;
+            let envioGlobal = 0;
+
+            function renderizarCarrito() {
+                if (carrito.length === 0) {
+                    listaCarrito.innerHTML = '<p style="font-size:0.9rem; color:#666;">Tu bolsa está vacía.</p>';
+                    subtotalGlobal = 0;
+                } else {
+                    subtotalGlobal = carrito.reduce((acc, item) => acc + item.price, 0);
+                    listaCarrito.innerHTML = carrito.map((item, index) => `
+                        <div class="cart-item">
+                            <img src="${item.image}" alt="${item.name}">
+                            <div class="cart-item-info">
+                                <div>
+                                    <strong style="display:block">${item.name}</strong>
+                                    <button class="btn-remove" onclick="eliminarDelCarrito(${index})">Eliminar</button>
+                                </div>
+                                <span>$${item.price.toLocaleString('es-CL')}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                actualizarTotales();
+            }
+
+            window.eliminarDelCarrito = function(index) {
+                carrito.splice(index, 1);
+                localStorage.setItem('catjoyas_cart', JSON.stringify(carrito));
+                renderizarCarrito();
+            };
+
+            function actualizarTotales() {
+                labelSubtotal.innerText = `Subtotal (${carrito.length} items)`;
+                spanSubtotal.innerText = `$${subtotalGlobal.toLocaleString('es-CL')}`;
+                
+                const totalFinal = subtotalGlobal + envioGlobal;
+                spanTotalPedido.innerText = `$${totalFinal.toLocaleString('es-CL')}`;
+            }
+
+            // Lógica de cotización de envío
+            if (inputComuna) {
+                inputComuna.addEventListener('blur', async (e) => {
+                    const comunaEscrita = e.target.value.trim();
+                    if (!comunaEscrita || carrito.length === 0) return;
+
+                    loader.style.display = 'inline';
+
+                    try {
+                        const response = await fetch('http://localhost:3000/api/shipping/quote', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ commune: comunaEscrita, weightKg: 0.5 })
+                        });
+                        
+                        const data = await response.json();
+
+                        if (data.costCLP) {
+                            envioGlobal = data.costCLP;
+                            spanCostoEnvio.innerText = `$${envioGlobal.toLocaleString('es-CL')}`;
+                            actualizarTotales();
+                        }
+                    } catch (error) {
+                        console.error('Error de conexión:', error);
+                    } finally {
+                        loader.style.display = 'none';
+                    }
+                });
+            }
+
+            // Inicializar vista
+            renderizarCarrito();
+        });
+    </script>
+</body>
+</html>

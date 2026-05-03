@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Marca | Cat Joyas</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+    <style>
+        .story-image img { border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container header-layout">
+            <nav class="header-nav nav-left">
+                <ul class="menu-list">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="catalogo.html">Catálogo</a></li>
+                    <li><a href="nosotros.html" class="active">La Marca</a></li>
+                </ul>
+            </nav>
+            <div class="brand-center">
+                <a href="index.html" class="logo-link">
+                    <h1 class="logo-title">CAT JOYAS</h1>
+                    <span class="logo-subtitle">SANTIAGO DE CHILE</span>
+                </a>
+            </div>
+            <nav class="header-nav nav-right">
+                <ul class="menu-list">
+                    <li><a href="envio.html">Envíos</a></li>
+                    <li><a href="contacto.html">Contacto</a></li>
+                    <li><a href="carrito.html" class="cart-btn" id="header-cart-count">BOLSA (0)</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content">
+        <section class="brand-hero fade-in" style="height: 50vh; background-color: #f9f9f9; display: flex; align-items: center; justify-content: center; text-align: center;">
+            <div class="container">
+                <span style="color: #c5a059; font-size: 12px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; display: block;">Nuestra Historia</span>
+                <h1 style="font-family: 'Playfair Display', serif; font-size: 4rem; color: #1a1a1a;">Forjando Legados</h1>
+            </div>
+        </section>
+
+        <section class="brand-story section-spacing" style="background-color: #ffffff;">
+            <div class="container story-grid">
+                <div class="story-image fade-in">
+                    <img src="https://i.ibb.co/L50H8nF/mesa-de-trabajo-taller-de-joyeria.jpg" alt="Taller Cat Joyas" style="width: 100%; height: auto;">
+                </div>
+                <div class="story-text fade-in">
+                    <h2 style="font-size: 3rem; margin-bottom: 30px; line-height: 1.2;">Un oficio que desafía el tiempo</h2>
+                    <p>Cat Joyas nació en Santiago con una visión clara: devolverle a la joyería su valor emocional. En un mundo dominado por la producción en masa, decidimos apostar por el tiempo, la paciencia y el rigor de la orfebrería tradicional.</p>
+                    <p>Cada anillo, collar o pulsera que sale de nuestro taller ha pasado por un proceso meticuloso. Fundimos nuestros propios metales y trabajamos de manera exclusiva con Oro 18k y Plata 925, asegurando que los materiales nobles se respeten en su estado más puro.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="vision-section section-spacing-sm fade-in" style="background-color: #fcfcfc;">
+            <div class="container-small text-center">
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 25px;">Nuestra Promesa</h2>
+                <p style="font-size: 18px; line-height: 1.8; color: #757575;">"No creamos simples accesorios. Diseñamos piezas que te acompañarán en tus momentos más importantes, joyas que heredarán las futuras generaciones manteniendo su brillo y su significado intactos."</p>
+                <div style="margin-top: 40px;">
+                    <a href="catalogo.html" class="btn-primary">Ver Colecciones</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container footer-layout">
+            <div class="brand-col">
+                <h4>CAT JOYAS</h4>
+                <p>Referente de orfebrería de autor en Santiago. Manufactura de alta gama y diseño atemporal.</p>
+            </div>
+            <nav class="footer-col">
+                <h5>Explorar</h5>
+                <ul><li><a href="catalogo.html">Catálogo Completo</a></li><li><a href="nosotros.html">La Marca</a></li></ul>
+            </nav>
+            <nav class="footer-col">
+                <h5>Soporte</h5>
+                <ul><li><a href="envio.html">Envíos y Despachos</a></li><li><a href="contacto.html">Contacto</a></li></ul>
+            </nav>
+            <div class="footer-col">
+                <h5>Contacto</h5>
+                <ul class="contact-data"><li>La Reina, Santiago de Chile</li><li>contacto@catjoyas.cl</li></ul>
+            </div>
+        </div>
+        <div class="footer-bottom"><div class="container bottom-bar"><p>&copy; 2026 CAT JOYAS.</p></div></div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Actualizar la bolsa
+            const cartCountEl = document.getElementById('header-cart-count');
+            let carrito = JSON.parse(localStorage.getItem('catjoyas_cart')) || [];
+            if(cartCountEl) cartCountEl.innerText = `BOLSA (${carrito.length})`;
+
+            // Animaciones
+            const observer = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) { entry.target.classList.add('visible'); obs.unobserve(entry.target); }
+                });
+            }, { threshold: 0.15 });
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

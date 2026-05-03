@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bolsa de Compras | Cat Joyas</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+    <style>
+        .cart-container { max-width: 900px; margin: 40px auto; }
+        .cart-table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+        .cart-table th { text-align: left; padding: 15px; border-bottom: 2px solid #000; text-transform: uppercase; font-size: 0.85rem; }
+        .cart-table td { padding: 20px 15px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        .cart-item-td { display: flex; align-items: center; gap: 20px; }
+        .cart-item-td img { width: 80px; height: 80px; object-fit: contain; border: 1px solid #f5f5f5; background: #fff; }
+        .cart-item-name { font-weight: 700; font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+        .btn-remove { background: none; border: none; color: #999; cursor: pointer; text-decoration: underline; font-size: 0.85rem; padding: 0; margin-top: 5px; }
+        .btn-remove:hover { color: #d32f2f; }
+        .cart-totals { width: 100%; max-width: 350px; margin-left: auto; background: #fafafa; padding: 30px; border: 1px solid #eee; }
+        .totals-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1rem; }
+        .totals-final { border-top: 2px solid #000; margin-top: 15px; padding-top: 15px; font-weight: 700; font-size: 1.3rem; }
+        .btn-checkout { display: block; width: 100%; padding: 18px; background: #000; color: #fff; text-transform: uppercase; border: none; font-weight: 700; cursor: pointer; text-align: center; text-decoration: none; margin-top: 25px; transition: background 0.3s; }
+        .btn-checkout:hover { background: #333; }
+        .empty-cart-msg { text-align: center; padding: 80px 20px; }
+        .empty-cart-msg h3 { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container header-layout">
+            <nav class="header-nav nav-left">
+                <ul class="menu-list">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="catalogo.html">Catálogo</a></li>
+                </ul>
+            </nav>
+            <div class="brand-center">
+                <a href="index.html" class="logo-link">
+                    <h1 class="logo-title">CAT JOYAS</h1>
+                    <span class="logo-subtitle">SANTIAGO DE CHILE</span>
+                </a>
+            </div>
+            <nav class="header-nav nav-right">
+                <ul class="menu-list">
+                    <li><a href="carrito.html" class="cart-btn active" id="header-cart-count">BOLSA (0)</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="cart-container section-spacing">
+        <h2>Tu Bolsa de Compras</h2>
+        
+        <div id="cart-content">
+            </div>
+    </main>
+
+    <footer class="main-footer" style="margin-top: auto;">
+        <div class="footer-bottom">
+            <div class="container bottom-bar">
+                <p>&copy; 2026 CAT JOYAS. PROPIEDAD INTELECTUAL REGISTRADA.</p>
+                <div class="payment-methods">WEBPAY | TRANSFERENCIA</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cartContent = document.getElementById('cart-content');
+            const cartCountEl = document.getElementById('header-cart-count');
+            
+            let carrito = JSON.parse(localStorage.getItem('catjoyas_cart')) || [];
+
+            function actualizarContador() {
+                cartCountEl.innerText = `BOLSA (${carrito.length})`;
+            }
+
+            window.eliminarItem = function(index) {
+                carrito.splice(index, 1);
+                localStorage.setItem('catjoyas_cart', JSON.stringify(carrito));
+                renderizarCarritoVista();
+            };
+
+            function renderizarCarritoVista() {
+                actualizarContador();
+
+                if (carrito.length === 0) {
+                    cartContent.innerHTML = `
+                        <div class="empty-cart-msg fade-in visible">
+                            <h3>Tu bolsa está vacía</h3>
+                            <p style="margin-bottom: 30px; color: #666;">Descubre nuestras piezas de orfebrería de autor.</p>
+                            <a href="catalogo.html" class="btn-primary" style="display: inline-block;">Explorar Catálogo</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const subtotal = carrito.reduce((acc, item) => acc + item.price, 0);
+
+                let html = `
+                    <table class="cart-table fade-in visible">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                carrito.forEach((item, index) => {
+                    html += `
+                        <tr>
+                            <td>
+                                <div class="cart-item-td">
+                                    <img src="${item.image}" alt="${item.name}">
+                                    <div>
+                                        <div class="cart-item-name">${item.name}</div>
+                                        <button class="btn-remove" onclick="eliminarItem(${index})">Eliminar pieza</button>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="font-size: 1.1rem;">$${item.price.toLocaleString('es-CL')}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                        </tbody>
+                    </table>
+
+                    <div class="cart-totals fade-in visible">
+                        <div class="totals-row">
+                            <span>Subtotal (${carrito.length} piezas)</span>
+                            <span>$${subtotal.toLocaleString('es-CL')}</span>
+                        </div>
+                        <div class="totals-row" style="font-size: 0.85rem; color: #666;">
+                            <span>Costo de envío</span>
+                            <span>Calculado en el checkout</span>
+                        </div>
+                        <div class="totals-row totals-final">
+                            <span>Subtotal</span>
+                            <span>$${subtotal.toLocaleString('es-CL')}</span>
+                        </div>
+                        <a href="checkout.html" class="btn-checkout">Proceder al Pago</a>
+                    </div>
+                `;
+
+                cartContent.innerHTML = html;
+            }
+
+            renderizarCarritoVista();
+        });
+    </script>
+</body>
+</html>

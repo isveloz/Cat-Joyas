@@ -1,0 +1,140 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Joya | Cat Joyas</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+    <style>
+        .product-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; margin-top: 40px; align-items: center; }
+        .product-gallery { background: #fff; border: 1px solid #eee; padding: 40px; text-align: center; }
+        .product-gallery img { max-width: 100%; height: auto; object-fit: contain; max-height: 500px; }
+        .product-info h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .product-info .material-tag { display: inline-block; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: #666; margin-bottom: 20px; }
+        .product-info .price { font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; display: block; }
+        .product-info p { line-height: 1.8; color: #444; margin-bottom: 40px; }
+        .btn-add-large { width: 100%; padding: 20px; background: #000; color: #fff; text-transform: uppercase; border: none; font-weight: 700; cursor: pointer; transition: background 0.3s; font-size: 1rem; }
+        .btn-add-large:hover { background: #333; }
+        .loader-detail { text-align: center; padding: 100px; font-style: italic; color: #666; grid-column: 1 / -1; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container header-layout">
+            <nav class="header-nav nav-left">
+                <ul class="menu-list">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="catalogo.html">Catálogo</a></li>
+                    <li><a href="nosotros.html">La Marca</a></li>
+                </ul>
+            </nav>
+            <div class="brand-center">
+                <a href="index.html" class="logo-link">
+                    <h1 class="logo-title">CAT JOYAS</h1>
+                    <span class="logo-subtitle">SANTIAGO DE CHILE</span>
+                </a>
+            </div>
+            <nav class="header-nav nav-right">
+                <ul class="menu-list">
+                    <li><a href="envio.html">Envíos</a></li>
+                    <li><a href="contacto.html">Contacto</a></li>
+                    <li><a href="carrito.html" class="cart-btn" id="header-cart-count">BOLSA (0)</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container section-spacing">
+        <a href="catalogo.html" style="text-transform: uppercase; font-size: 0.8rem; text-decoration: none; color: #666;">&larr; Volver al Catálogo</a>
+        
+        <div id="contenedor-detalle" class="product-detail-grid">
+            <div class="loader-detail">Obteniendo información del taller...</div>
+        </div>
+    </main>
+
+    <footer class="main-footer" style="margin-top: 60px;">
+        <div class="footer-bottom">
+            <div class="container bottom-bar">
+                <p>&copy; 2026 CAT JOYAS. PROPIEDAD INTELECTUAL REGISTRADA.</p>
+                <div class="payment-methods">WEBPAY | TRANSFERENCIA</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const contenedor = document.getElementById('contenedor-detalle');
+            const cartCountEl = document.getElementById('header-cart-count');
+            
+            // Lógica de Carrito
+            let carrito = JSON.parse(localStorage.getItem('catjoyas_cart')) || [];
+            
+            function actualizarContador() {
+                cartCountEl.innerText = `BOLSA (${carrito.length})`;
+            }
+            actualizarContador();
+
+            window.agregarAlCarrito = function(id, name, price, image, btnElement) {
+                carrito.push({ id, name, price, image });
+                localStorage.setItem('catjoyas_cart', JSON.stringify(carrito));
+                actualizarContador();
+                
+                const textoOriginal = btnElement.innerText;
+                btnElement.innerText = "¡Añadido a la Bolsa!";
+                btnElement.style.backgroundColor = "#4CAF50";
+                setTimeout(() => {
+                    btnElement.innerText = textoOriginal;
+                    btnElement.style.backgroundColor = "#000";
+                }, 1500);
+            };
+
+            // Cargar Producto
+            async function cargarProducto() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const productId = urlParams.get('id');
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/products');
+                    const productos = await response.json();
+                    
+                    // Buscamos el producto específico (o mostramos el primero si no hay ID para pruebas)
+                    const prod = productId ? productos.find(p => p.id === productId) : productos[0];
+
+                    if (prod) {
+                        contenedor.innerHTML = `
+                            <div class="product-gallery fade-in visible">
+                                <img src="${prod.imageUrl}" alt="${prod.name}">
+                            </div>
+                            <div class="product-info fade-in visible">
+                                <span class="material-tag">${prod.material}</span>
+                                <h1>${prod.name}</h1>
+                                <span class="price">$${prod.price.toLocaleString('es-CL')}</span>
+                                <p>${prod.description}</p>
+                                
+                                <ul style="margin-bottom: 30px; font-size: 0.9rem; color: #666; line-height: 1.6; padding-left: 20px;">
+                                    <li>Hecho a mano en Santiago de Chile.</li>
+                                    <li>Incluye estuche de lujo y certificado.</li>
+                                    <li>Despacho asegurado a todo el país.</li>
+                                </ul>
+
+                                <button class="btn-add-large" onclick="agregarAlCarrito('${prod.id}', '${prod.name}', ${prod.price}, '${prod.imageUrl}', this)">
+                                    Añadir al pedido
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        contenedor.innerHTML = '<div class="loader-detail">Producto no encontrado.</div>';
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    contenedor.innerHTML = '<div class="loader-detail" style="color:red;">Error de conexión con el servidor.</div>';
+                }
+            }
+
+            cargarProducto();
+        });
+    </script>
+</body>
+</html>

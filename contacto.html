@@ -1,0 +1,105 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto | Cat Joyas</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+    <style>
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 40px; }
+        .contact-info h2 { font-size: 2.2rem; margin-bottom: 20px; }
+        .contact-info p { line-height: 1.8; color: #555; margin-bottom: 30px; }
+        .contact-details li { margin-bottom: 15px; font-family: 'Lato', sans-serif; color: #333; }
+        .contact-details strong { font-weight: 700; display: inline-block; width: 100px; }
+        
+        .contact-form { background: #fafafa; padding: 40px; border: 1px solid #eee; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ccc; font-family: 'Lato', sans-serif; }
+        .form-group textarea { resize: vertical; min-height: 120px; }
+        .btn-submit { display: inline-block; width: 100%; padding: 15px; background: #000; color: #fff; text-transform: uppercase; border: none; font-weight: 700; cursor: pointer; transition: background 0.3s; }
+        .btn-submit:hover { background: #333; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container header-layout">
+            <nav class="header-nav nav-left">
+                <ul class="menu-list">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="catalogo.html">Catálogo</a></li>
+                    <li><a href="nosotros.html">La Marca</a></li>
+                </ul>
+            </nav>
+            <div class="brand-center">
+                <a href="index.html" class="logo-link">
+                    <h1 class="logo-title">CAT JOYAS</h1>
+                    <span class="logo-subtitle">SANTIAGO DE CHILE</span>
+                </a>
+            </div>
+            <nav class="header-nav nav-right">
+                <ul class="menu-list">
+                    <li><a href="envio.html">Envíos</a></li>
+                    <li><a href="contacto.html" class="active">Contacto</a></li>
+                    <li><a href="carrito.html" class="cart-btn" id="header-cart-count">BOLSA (0)</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container section-spacing">
+        <div class="contact-grid">
+            <div class="contact-info fade-in visible">
+                <h2>Hablemos de Joyería</h2>
+                <p>¿Busca una pieza personalizada, argollas de matrimonio o tiene dudas sobre nuestro catálogo actual? Escríbanos y nuestro taller se pondrá en contacto a la brevedad.</p>
+                
+                <ul class="contact-details" style="list-style: none; padding: 0;">
+                    <li><strong>Taller:</strong> La Reina, Santiago de Chile</li>
+                    <li><strong>Email:</strong> contacto@catjoyas.cl</li>
+                    <li><strong>Horario:</strong> Lunes a Viernes, 09:00 - 18:00 hrs.</li>
+                </ul>
+            </div>
+            
+            <div class="contact-form fade-in visible">
+                <form onsubmit="event.preventDefault(); alert('Mensaje enviado al taller. Le responderemos pronto.');">
+                    <div class="form-group">
+                        <label for="nombre">Nombre Completo</label>
+                        <input type="text" id="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="asunto">Asunto</label>
+                        <input type="text" id="asunto" placeholder="Ej: Cotización proyecto a medida" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mensaje">Mensaje</label>
+                        <textarea id="mensaje" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Enviar Mensaje</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer" style="margin-top: auto;">
+        <div class="footer-bottom">
+            <div class="container bottom-bar">
+                <p>&copy; 2026 CAT JOYAS. ATENCIÓN PERSONALIZADA.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cartCountEl = document.getElementById('header-cart-count');
+            let carrito = JSON.parse(localStorage.getItem('catjoyas_cart')) || [];
+            cartCountEl.innerText = `BOLSA (${carrito.length})`;
+        });
+    </script>
+</body>
+</html>
