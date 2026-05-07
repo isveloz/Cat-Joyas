@@ -11,6 +11,8 @@
     
     <title>Cat Joyas | Orfebrería de Autor y Alta Joyería</title>
 
+    <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
+
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,9 +37,8 @@
             </nav>
 
             <div class="brand-center">
-                <a href="index.html" class="logo-link">
-                    <h1 class="logo-title">CAT JOYAS</h1>
-                    <span class="logo-subtitle">SANTIAGO DE CHILE</span>
+                <a href="index.html" class="logo-link" style="display: flex; justify-content: center; align-items: center;">
+                    <img src="img/catjoyaslogo.jpg" alt="Cat Joyas - Santiago de Chile" style="max-height: 85px; width: auto; object-fit: contain;">
                 </a>
             </div>
 
@@ -45,7 +46,7 @@
                 <ul class="menu-list">
                     <li><a href="envio.html">Envíos</a></li>
                     <li><a href="contacto.html">Contacto</a></li>
-                    <li><a href="carrito.html" class="cart-btn">BOLSA (0)</a></li>
+                    <li><a href="carrito.html" class="cart-btn" id="header-cart-count">BOLSA (0)</a></li>
                 </ul>
             </nav>
         </div>
@@ -182,7 +183,7 @@
                             <span class="prod-tag">Oro 18k</span>
                             <h4>Medalla San Benito</h4>
                             <span class="prod-price">$125.000</span>
-                            <button class="btn-add-bag">Añadir al pedido</button>
+                            <button class="btn-add-bag" onclick="window.location.href='catalogo.html'">Ver en Catálogo</button>
                         </div>
                     </article>
                     <article class="product-item fade-in">
@@ -191,7 +192,7 @@
                             <span class="prod-tag">Lapislázuli Imperial</span>
                             <h4>Anillo Profundo</h4>
                             <span class="prod-price">$45.000</span>
-                            <button class="btn-add-bag">Añadir al pedido</button>
+                            <button class="btn-add-bag" onclick="window.location.href='catalogo.html'">Ver en Catálogo</button>
                         </div>
                     </article>
                     <article class="product-item fade-in">
@@ -200,7 +201,7 @@
                             <span class="prod-tag">Plata 925</span>
                             <h4>Cadena Eslabón</h4>
                             <span class="prod-price">$42.000</span>
-                            <button class="btn-add-bag">Añadir al pedido</button>
+                            <button class="btn-add-bag" onclick="window.location.href='catalogo.html'">Ver en Catálogo</button>
                         </div>
                     </article>
                     <article class="product-item fade-in">
@@ -209,7 +210,7 @@
                             <span class="prod-tag">Piedra Natural</span>
                             <h4>Colgante Lapis</h4>
                             <span class="prod-price">$38.000</span>
-                            <button class="btn-add-bag">Añadir al pedido</button>
+                            <button class="btn-add-bag" onclick="window.location.href='catalogo.html'">Ver en Catálogo</button>
                         </div>
                     </article>
                 </div>
@@ -285,6 +286,12 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Actualización del carrito en el encabezado
+            const cartCountEl = document.getElementById('header-cart-count');
+            let carrito = JSON.parse(localStorage.getItem('catjoyas_cart')) || [];
+            if(cartCountEl) cartCountEl.innerText = `BOLSA (${carrito.length})`;
+
+            // Lógica del carrusel
             let slideIndex = 0;
             const slides = document.querySelectorAll('.slide');
             function updateSlide(index) {
@@ -297,6 +304,8 @@
                 clearInterval(autoPlay); 
                 updateSlide(slideIndex + n);
             };
+
+            // Animaciones al hacer scroll
             const observer = new IntersectionObserver((entries, obs) => {
                 entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); obs.unobserve(entry.target); } });
             }, { threshold: 0.1 });

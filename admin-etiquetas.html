@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etiquetas Taller | Cat Joyas</title>
+    
+    <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Lato', sans-serif; background-color: #f5f5f5; color: #333; padding: 20px; }
+        .header-taller { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+        .btn-print { background: #000; color: #fff; border: none; padding: 10px 20px; text-transform: uppercase; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .btn-print:hover { background: #333; }
+        
+        .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .qr-card { background: #fff; border: 1px dashed #999; padding: 15px; text-align: center; border-radius: 4px; }
+        .qr-card img { width: 100%; max-width: 120px; height: auto; margin-top: 10px; }
+        .qr-sku { font-family: monospace; font-size: 1.1rem; font-weight: bold; margin-top: 5px; }
+        .qr-name { font-size: 0.85rem; color: #666; text-transform: uppercase; }
+
+        @media print {
+            body { background-color: #fff; padding: 0; }
+            .no-print { display: none !important; }
+            .qr-card { border: 1px solid #000; page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-taller no-print">
+        <div>
+            <h1 style="margin: 0; text-transform: uppercase; letter-spacing: 2px;">Generador de Etiquetas</h1>
+            <p style="margin: 5px 0 0 0; color: #666;">Módulo de Taller - Cat Joyas</p>
+        </div>
+        <button class="btn-print" onclick="window.print()">Imprimir Etiquetas</button>
+    </div>
+
+    <div id="loading" class="no-print">Generando códigos únicos desde el servidor...</div>
+
+    <div class="qr-grid" id="qr-grid">
+        </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const grid = document.getElementById('qr-grid');
+            const loading = document.getElementById('loading');
+
+            try {
+                // Usamos rutas relativas para que funcione en PC y Celular sin problemas
+                const resCatalogo = await fetch('/api/products');
+                const productos = await resCatalogo.json();
+
+                for (const prod of productos) {
+                    const resQr = await fetch(`/api/qr/${prod.sku}`);
+                    const dataQr = await resQr.json();
+
+                    grid.innerHTML += `
+                        <div class="qr-card">
+                            <div class="qr-name">${dataQr.name}</div>
+                            <div class="qr-sku">${dataQr.sku}</div>
+                            <img src="${dataQr.qrImage}" alt="QR de ${dataQr.sku}">
+                        </div>
+                    `;
+                }
+                loading.style.display = 'none';
+            } catch (error) {
+                console.error("Error cargando etiquetas:", error);
+                loading.innerText = 'Error al conectar con la base de datos.';
+                loading.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>

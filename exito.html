@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido Confirmado | Cat Joyas</title>
+    
+    <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
+    
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+    <style>
+        .success-box { text-align: center; max-width: 600px; margin: 80px auto; padding: 50px; background: #fafafa; border: 1px solid #eee; }
+        .success-box h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 20px; }
+        .order-number { font-size: 1.5rem; font-family: monospace; background: #eee; padding: 10px 20px; display: inline-block; margin: 20px 0; letter-spacing: 2px; }
+        .success-box p { line-height: 1.8; color: #555; }
+        .btn-home { display: inline-block; margin-top: 30px; padding: 15px 30px; background: #000; color: #fff; text-transform: uppercase; text-decoration: none; font-weight: 700; font-family: 'Lato', sans-serif; }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container header-layout" style="justify-content: center;">
+            <div class="brand-center">
+                <a href="index.html" class="logo-link" style="display: flex; justify-content: center; align-items: center;">
+                    <img src="img/catjoyaslogo.jpg" alt="Cat Joyas - Santiago de Chile" style="max-height: 85px; width: auto; object-fit: contain;">
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container section-spacing">
+        <div class="success-box fade-in">
+            <h1 style="color: #4CAF50;">¡Su pedido está confirmado!</h1>
+            <p>Gracias por confiar en Cat Joyas. Su transacción ha sido procesada con éxito y nuestro taller ya ha sido notificado para preparar su pieza.</p>
+            
+            <div>
+                <span style="display: block; font-size: 0.85rem; text-transform: uppercase; margin-top: 30px;">Número de Orden</span>
+                <div class="order-number" id="display-orden">Cargando...</div>
+            </div>
+
+            <p>Le hemos enviado un correo electrónico con los detalles de su compra y los tiempos de despacho.</p>
+            
+            <a href="index.html" class="btn-home">Volver al Inicio</a>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orden = urlParams.get('orden');
+            if(orden) {
+                document.getElementById('display-orden').innerText = orden;
+            } else {
+                document.getElementById('display-orden').innerText = "ERROR-DE-LECTURA";
+            }
+        });
+    </script>
+</body>
+</html>

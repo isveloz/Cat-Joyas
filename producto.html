@@ -17,6 +17,21 @@
         .btn-add-large { width: 100%; padding: 20px; background: #000; color: #fff; text-transform: uppercase; border: none; font-weight: 700; cursor: pointer; transition: background 0.3s; font-size: 1rem; }
         .btn-add-large:hover { background: #333; }
         .loader-detail { text-align: center; padding: 100px; font-style: italic; color: #666; grid-column: 1 / -1; }
+        
+        /* === ESTILOS NUEVOS: SECCIÓN DE RESEÑAS === */
+        .reviews-section { margin-top: 80px; border-top: 1px solid #eee; padding-top: 40px; }
+        .reviews-section h2 { font-size: 2rem; margin-bottom: 30px; text-align: center; }
+        .review-card { background: #fafafa; padding: 25px; border: 1px solid #eee; margin-bottom: 15px; border-radius: 4px; }
+        .stars { color: #c5a059; font-size: 1.3rem; margin-bottom: 10px; letter-spacing: 2px; }
+        .review-author { font-weight: 700; font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+        .review-date { font-size: 0.85rem; color: #999; margin-bottom: 15px; display: block; font-family: 'Lato', sans-serif; }
+        
+        .review-form { background: #fff; padding: 30px; border: 1px solid #ddd; margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .review-form h3 { font-family: 'Lato', sans-serif; text-transform: uppercase; font-size: 1rem; border-bottom: 2px solid #000; display: inline-block; padding-bottom: 5px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 1px solid #ccc; font-family: 'Lato', sans-serif; }
+        .form-group textarea { resize: vertical; }
     </style>
 </head>
 <body>
@@ -26,14 +41,13 @@
             <nav class="header-nav nav-left">
                 <ul class="menu-list">
                     <li><a href="index.html">Inicio</a></li>
-                    <li><a href="catalogo.html">Catálogo</a></li>
+                    <li><a href="catalogo.html" class="active">Catálogo</a></li>
                     <li><a href="nosotros.html">La Marca</a></li>
                 </ul>
             </nav>
             <div class="brand-center">
-                <a href="index.html" class="logo-link">
-                    <h1 class="logo-title">CAT JOYAS</h1>
-                    <span class="logo-subtitle">SANTIAGO DE CHILE</span>
+                <a href="index.html" class="logo-link" style="display: flex; justify-content: center; align-items: center;">
+                    <img src="img/catjoyaslogo.jpg" alt="Cat Joyas - Santiago de Chile" style="max-height: 85px; width: auto; object-fit: contain;">
                 </a>
             </div>
             <nav class="header-nav nav-right">
@@ -47,10 +61,42 @@
     </header>
 
     <main class="container section-spacing">
-        <a href="catalogo.html" style="text-transform: uppercase; font-size: 0.8rem; text-decoration: none; color: #666;">&larr; Volver al Catálogo</a>
+        <a href="catalogo.html" style="text-transform: uppercase; font-size: 0.8rem; text-decoration: none; color: #666; letter-spacing: 1px;">&larr; Volver al Catálogo</a>
         
         <div id="contenedor-detalle" class="product-detail-grid">
             <div class="loader-detail">Obteniendo información del taller...</div>
+        </div>
+
+        <div class="reviews-section" id="reviews-area" style="display:none;">
+            <h2>Valoraciones de Clientes</h2>
+            
+            <div class="review-form fade-in">
+                <h3>Dejar una reseña</h3>
+                <form id="form-review">
+                    <div class="form-group">
+                        <label>Tu Nombre</label>
+                        <input type="text" id="rev-name" placeholder="Ej: Camila R." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Calificación</label>
+                        <select id="rev-rating" required>
+                            <option value="5">★★★★★ - Excelente pieza</option>
+                            <option value="4">★★★★☆ - Muy Buena</option>
+                            <option value="3">★★★☆☆ - Buena</option>
+                            <option value="2">★★☆☆☆ - Regular</option>
+                            <option value="1">★☆☆☆☆ - No me gustó</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tu Comentario</label>
+                        <textarea id="rev-comment" rows="4" placeholder="¿Qué te pareció la calidad y el diseño de esta joya?" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-add-large" style="padding: 15px;">Publicar Reseña</button>
+                </form>
+            </div>
+
+            <div id="reviews-list">
+                </div>
         </div>
     </main>
 
@@ -66,6 +112,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const contenedor = document.getElementById('contenedor-detalle');
+            const reviewsArea = document.getElementById('reviews-area');
             const cartCountEl = document.getElementById('header-cart-count');
             
             // Lógica de Carrito
@@ -90,7 +137,7 @@
                 }, 1500);
             };
 
-            // Cargar Producto
+            // Cargar Producto y Reseñas
             async function cargarProducto() {
                 const urlParams = new URLSearchParams(window.location.search);
                 const productId = urlParams.get('id');
@@ -114,23 +161,99 @@
                                 <p>${prod.description}</p>
                                 
                                 <ul style="margin-bottom: 30px; font-size: 0.9rem; color: #666; line-height: 1.6; padding-left: 20px;">
-                                    <li>Hecho a mano en Santiago de Chile.</li>
-                                    <li>Incluye estuche de lujo y certificado.</li>
+                                    <li>Hecho a mano en nuestro taller.</li>
+                                    <li>Incluye estuche de presentación.</li>
                                     <li>Despacho asegurado a todo el país.</li>
                                 </ul>
 
-                                <button class="btn-add-large" onclick="agregarAlCarrito('${prod.id}', '${prod.name}', ${prod.price}, '${prod.imageUrl}', this)">
-                                    Añadir al pedido
+                                <p style="font-size:0.85rem; font-weight:bold; margin-bottom:15px; color:${prod.stock > 0 ? '#4CAF50' : '#f44336'};">
+                                    ${prod.stock > 0 ? `Stock disponible: ${prod.stock} unidades` : 'Agotado temporalmente en taller'}
+                                </p>
+
+                                <button class="btn-add-large" ${prod.stock === 0 ? 'disabled style="background:#ccc;cursor:not-allowed;"' : ''} onclick="agregarAlCarrito('${prod.id}', '${prod.name}', ${prod.price}, '${prod.imageUrl}', this)">
+                                    ${prod.stock === 0 ? 'Sin Stock' : 'Añadir al pedido'}
                                 </button>
                             </div>
                         `;
+
+                        // Mostrar la sección de reseñas y cargarlas
+                        reviewsArea.style.display = 'block';
+                        cargarResenasLista(prod.id);
+                        configurarFormularioResenas(prod.id);
+
                     } else {
-                        contenedor.innerHTML = '<div class="loader-detail">Producto no encontrado.</div>';
+                        contenedor.innerHTML = '<div class="loader-detail">Producto no encontrado en el catálogo.</div>';
                     }
                 } catch (error) {
                     console.error('Error:', error);
                     contenedor.innerHTML = '<div class="loader-detail" style="color:red;">Error de conexión con el servidor.</div>';
                 }
+            }
+
+            // Función para obtener y pintar la lista de reseñas
+            async function cargarResenasLista(prodId) {
+                const list = document.getElementById('reviews-list');
+                try {
+                    const res = await fetch(`http://localhost:3000/api/reviews/${prodId}`);
+                    const reviews = await res.json();
+
+                    if (reviews.length === 0) {
+                        list.innerHTML = '<p style="text-align:center; color:#666; font-style:italic;">Aún no hay reseñas para esta pieza. ¡Sé el primero en opinar!</p>';
+                        return;
+                    }
+
+                    list.innerHTML = reviews.map(r => {
+                        const starsHTML = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+                        const fechaFormat = new Date(r.createdAt).toLocaleDateString('es-CL', { year: 'numeric', month: 'long', day: 'numeric' });
+                        return `
+                            <div class="review-card fade-in visible">
+                                <div class="stars">${starsHTML}</div>
+                                <div class="review-author">${r.authorName} <span style="font-weight:normal; color:#888; font-size:0.8rem; font-family:Lato;">- Comprador verificado</span></div>
+                                <div class="review-date">${fechaFormat}</div>
+                                <p style="margin:0; color:#444; line-height:1.6;">"${r.comment}"</p>
+                            </div>
+                        `;
+                    }).join('');
+                } catch (error) {
+                    list.innerHTML = '<p style="color:red; text-align:center;">No se pudieron cargar las reseñas.</p>';
+                }
+            }
+
+            // Configurar el evento del formulario para enviar nuevas reseñas
+            function configurarFormularioResenas(prodId) {
+                const form = document.getElementById('form-review');
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const btn = e.target.querySelector('button');
+                    const textoOriginalBtn = btn.innerText;
+                    btn.innerText = "Enviando comentario...";
+
+                    const data = {
+                        productId: prodId,
+                        authorName: document.getElementById('rev-name').value,
+                        rating: document.getElementById('rev-rating').value,
+                        comment: document.getElementById('rev-comment').value
+                    };
+
+                    try {
+                        const res = await fetch('http://localhost:3000/api/reviews', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data)
+                        });
+                        
+                        if (res.ok) {
+                            form.reset();
+                            cargarResenasLista(prodId); // Recargar la lista para mostrar el nuevo comentario
+                        } else {
+                            alert("Hubo un error al procesar su reseña.");
+                        }
+                    } catch (err) {
+                        alert("Fallo de conexión al enviar el comentario.");
+                    } finally {
+                        btn.innerText = textoOriginalBtn;
+                    }
+                });
             }
 
             cargarProducto();

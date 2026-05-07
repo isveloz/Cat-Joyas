@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | Cat Joyas</title>
+    
+    <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
+    
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
     <style>
@@ -31,11 +34,13 @@
 
     <header class="main-header">
         <div class="container header-layout">
-            <nav class="header-nav nav-left"><a href="catalogo.html" style="font-size: 0.85rem; text-transform: uppercase;">&larr; Volver al catálogo</a></nav>
+            <nav class="header-nav nav-left">
+                <a href="carrito.html" style="font-size: 0.85rem; text-transform: uppercase; color: #000; text-decoration: none; letter-spacing: 1px;">&larr; Volver a la bolsa</a>
+            </nav>
             <div class="brand-center">
-                <a href="index.html" class="logo-link">
-                    <h1 class="logo-title">CAT JOYAS</h1>
-                    <span class="logo-subtitle">PAGO SEGURO</span>
+                <a href="index.html" class="logo-link" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-decoration: none;">
+                    <img src="img/catjoyaslogo.jpg" alt="Cat Joyas - Santiago de Chile" style="max-height: 70px; width: auto; object-fit: contain;">
+                    <span style="font-size: 0.7rem; letter-spacing: 3px; color: #666; margin-top: 8px;">PAGO SEGURO</span>
                 </a>
             </div>
             <nav class="header-nav nav-right"></nav>
@@ -48,7 +53,7 @@
         <div class="checkout-grid">
             <div class="checkout-form">
                 <h3>Datos de Envío</h3>
-                <form id="form-pago" onsubmit="event.preventDefault(); alert('Conectando a Transbank...');">
+                <form id="form-pago">
                     <div class="form-group">
                         <label for="email">Correo Electrónico</label>
                         <input type="email" id="email" required>
@@ -94,7 +99,7 @@
                     <span id="total-pedido">$0</span>
                 </div>
 
-                <button class="btn-pay" form="form-pago">Ir a Pagar con Webpay</button>
+                <button class="btn-pay" form="form-pago">Confirmar y Pagar</button>
             </div>
         </div>
     </main>
@@ -186,6 +191,59 @@
                     }
                 });
             }
+
+            // ==========================================
+            // LÓGICA DE SIMULACIÓN DE PAGO
+            // ==========================================
+            document.getElementById('form-pago').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (carrito.length === 0) {
+                    return alert("Tu bolsa está vacía.");
+                }
+
+                const btn = document.querySelector('.btn-pay');
+                btn.innerText = "Procesando orden...";
+                btn.disabled = true;
+                btn.style.opacity = "0.7";
+
+                const payload = {
+                    customerData: {
+                        email: document.getElementById('email').value,
+                        nombre: document.getElementById('nombre').value,
+                        apellido: document.getElementById('apellido').value,
+                        direccion: document.getElementById('direccion').value,
+                        comuna: document.getElementById('comuna').value
+                    },
+                    cart: carrito,
+                    shippingCost: envioGlobal
+                };
+
+                try {
+                    const res = await fetch('http://localhost:3000/api/checkout/simulate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                        localStorage.removeItem('catjoyas_cart'); 
+                        window.location.href = data.redirectUrl; 
+                    } else {
+                        alert(data.error || "Hubo un problema con la orden.");
+                        btn.innerText = "Confirmar y Pagar";
+                        btn.disabled = false;
+                        btn.style.opacity = "1";
+                    }
+                } catch (error) {
+                    alert("Error de conexión al servidor.");
+                    btn.innerText = "Confirmar y Pagar";
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                }
+            });
 
             // Inicializar vista
             renderizarCarrito();

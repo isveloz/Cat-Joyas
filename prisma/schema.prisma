@@ -11,17 +11,18 @@ datasource db {
 // 1. MODELO DE PRODUCTOS (El Catálogo)
 // ==========================================
 model Product {
-  id          String   @id @default(uuid())
-  sku         String   @unique
+  id          String      @id @default(uuid())
+  sku         String      @unique
   name        String
   description String
   material    String   
   price       Int      
-  stock       Int      @default(0)
+  stock       Int         @default(0)
   imageUrl    String
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
   orderItems  OrderItem[]
+  reviews     Review[]    // <-- AÑADIDO: Relación 1 a muchos con las reseñas
 }
 
 // ==========================================
@@ -64,9 +65,22 @@ model Order {
 model OrderItem {
   id        String  @id @default(uuid())
   quantity  Int
-  priceAt   Int     
+  priceAt   Int      
   orderId   String
   order     Order   @relation(fields: [orderId], references: [id])
   productId String
   product   Product @relation(fields: [productId], references: [id])
+}
+
+// ==========================================
+// 5. MODELO DE RESEÑAS Y CALIFICACIONES
+// ==========================================
+model Review {
+  id          String   @id @default(uuid())
+  authorName  String   // Nombre del cliente
+  rating      Int      // Estrellas (ej: del 1 al 5)
+  comment     String   // Texto de la reseña
+  productId   String   // ID del producto que se está calificando
+  product     Product  @relation(fields: [productId], references: [id])
+  createdAt   DateTime @default(now())
 }

@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo Completo | Cat Joyas</title>
+    
+    <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
+    
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
     <style>
@@ -30,16 +33,15 @@
                 </ul>
             </nav>
             <div class="brand-center">
-                <a href="index.html" class="logo-link">
-                    <h1 class="logo-title">CAT JOYAS</h1>
-                    <span class="logo-subtitle">SANTIAGO DE CHILE</span>
+                <a href="index.html" class="logo-link" style="display: flex; justify-content: center; align-items: center;">
+                    <img src="img/catjoyaslogo.jpg" alt="Cat Joyas - Santiago de Chile" style="max-height: 85px; width: auto; object-fit: contain;">
                 </a>
             </div>
             <nav class="header-nav nav-right">
                 <ul class="menu-list">
                     <li><a href="envio.html">Envíos</a></li>
                     <li><a href="contacto.html">Contacto</a></li>
-                    <li><a href="checkout.html" class="cart-btn" id="header-cart-count">BOLSA (0)</a></li>
+                    <li><a href="carrito.html" class="cart-btn" id="header-cart-count">BOLSA (0)</a></li>
                 </ul>
             </nav>
         </div>
@@ -122,7 +124,7 @@
                         </div>
                         <div class="prod-info">
                             <span class="prod-tag">${prod.material}</span>
-                            <h4>${prod.name}</h4>
+                            <h4><a href="producto.html?id=${prod.id}" style="color:#000; text-decoration:none;">${prod.name}</a></h4>
                             <span class="prod-price">$${prod.price.toLocaleString('es-CL')}</span>
                             <button class="btn-add-bag" onclick="agregarAlCarrito('${prod.id}', '${prod.name}', ${prod.price}, '${prod.imageUrl}')">Añadir al pedido</button>
                         </div>

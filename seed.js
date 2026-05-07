@@ -7,7 +7,7 @@ async function main() {
 
   const medalla = await prisma.product.upsert({
     where: { sku: 'SNB-001' },
-    update: {},
+    update: { imageUrl: 'img/medalla.san.png' },
     create: {
       sku: 'SNB-001',
       name: 'Medalla San Benito',
@@ -15,13 +15,13 @@ async function main() {
       material: 'Oro 18k',
       price: 125000,
       stock: 5,
-      imageUrl: 'img/snb.png',
+      imageUrl: 'img/medalla.san.png',
     },
   });
 
   const anillo = await prisma.product.upsert({
     where: { sku: 'LAP-001' },
-    update: {},
+    update: { imageUrl: 'img/anillolapizazul.jpg' },
     create: {
       sku: 'LAP-001',
       name: 'Anillo Lapis Imperial',
@@ -29,13 +29,13 @@ async function main() {
       material: 'Plata y Lapislázuli',
       price: 45000,
       stock: 3,
-      imageUrl: 'img/2021-04-01-115854246-scaled.jpg',
+      imageUrl: 'img/anillolapizazul.jpg',
     },
   });
 
   const cadena = await prisma.product.upsert({
     where: { sku: 'PLT-001' },
-    update: {},
+    update: { imageUrl: 'img/cadena.png' },
     create: {
       sku: 'PLT-001',
       name: 'Cadena Eslabón Clásico',
@@ -43,13 +43,13 @@ async function main() {
       material: 'Plata 925',
       price: 42000,
       stock: 10,
-      imageUrl: 'img/plta.jpg',
+      imageUrl: 'img/cadena.png',
     },
   });
 
   const colgante = await prisma.product.upsert({
     where: { sku: 'LAP-002' },
-    update: {},
+    update: { imageUrl: 'img/lpz.png' },
     create: {
       sku: 'LAP-002',
       name: 'Colgante Lapis',
@@ -58,6 +58,34 @@ async function main() {
       price: 38000,
       stock: 4,
       imageUrl: 'img/lpz.png',
+    },
+  });
+
+  const collarAgatas = await prisma.product.upsert({
+    where: { sku: 'COL-001' },
+    update: { imageUrl: 'img/medallon-sanbenito.jpg' }, 
+    create: {
+      sku: 'COL-001',
+      name: 'Collar de Ágatas',
+      description: 'Collar de ágatas rojas con detalles en oro.',
+      material: 'Ágata y Oro',
+      price: 65000,
+      stock: 2,
+      imageUrl: 'img/medallon-sanbenito.jpg',
+    },
+  });
+
+  const pulseraTejido = await prisma.product.upsert({
+    where: { sku: 'PUL-001' },
+    update: { imageUrl: 'img/pulsera.jpg' },
+    create: {
+      sku: 'PUL-001',
+      name: 'Pulsera Tejido Carmesí',
+      description: 'Pulsera de tejido rojo y oro de alta resistencia.',
+      material: 'Hilo y Oro 18k',
+      price: 25000,
+      stock: 8,
+      imageUrl: 'img/pulsera.jpg',
     },
   });
 
