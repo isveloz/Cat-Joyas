@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacto | Cat Joyas</title>
     
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
     <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
     
     <link rel="stylesheet" href="style.css">
@@ -65,8 +73,8 @@
             </div>
             
             <div class="contact-form fade-in visible">
-                <form onsubmit="event.preventDefault(); alert('Mensaje enviado al taller. Le responderemos pronto.');">
-                    <div class="form-group">
+                <form onsubmit="event.preventDefault(); gtag('event', 'generate_lead', { event_category: 'contacto', event_label: 'formulario_enviado' }); alert('Mensaje enviado al taller. Le responderemos pronto.');">
+                <div class="form-group">
                         <label for="nombre">Nombre Completo</label>
                         <input type="text" id="nombre" required>
                     </div>

@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | Cat Joyas</title>
     
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
     <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
     
     <link rel="stylesheet" href="style.css">
@@ -183,6 +191,20 @@
                             envioGlobal = data.costCLP;
                             spanCostoEnvio.innerText = `$${envioGlobal.toLocaleString('es-CL')}`;
                             actualizarTotales();
+
+                            // INICIO PIEZA GA4: Informacion de envio calculada
+                            gtag('event', 'add_shipping_info', {
+                                currency: 'CLP',
+                                value: subtotalGlobal + envioGlobal,
+                                shipping_tier: comunaEscrita,
+                                items: carrito.map(item => ({
+                                    item_id: item.id,
+                                    item_name: item.name,
+                                    price: item.price,
+                                    quantity: 1
+                                }))
+                            });
+                            // FIN PIEZA GA4
                         }
                     } catch (error) {
                         console.error('Error de conexión:', error);
@@ -218,6 +240,20 @@
                     cart: carrito,
                     shippingCost: envioGlobal
                 };
+
+                // INICIO PIEZA GA4: Agregar informacion de pago antes de procesar
+                gtag('event', 'add_payment_info', {
+                    currency: 'CLP',
+                    value: subtotalGlobal + envioGlobal,
+                    payment_type: 'Transferencia/Webpay',
+                    items: carrito.map(item => ({
+                        item_id: item.id,
+                        item_name: item.name,
+                        price: item.price,
+                        quantity: 1
+                    }))
+                });
+                // FIN PIEZA GA4
 
                 try {
                     const res = await fetch('http://localhost:3000/api/checkout/simulate', {

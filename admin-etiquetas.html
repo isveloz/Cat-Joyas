@@ -3,6 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      // Recuerda cambiar G-XXXXXXXXXX por tu ID real
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
     <title>Etiquetas Taller | Cat Joyas</title>
     
     <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
@@ -34,8 +44,9 @@
             <h1 style="margin: 0; text-transform: uppercase; letter-spacing: 2px;">Generador de Etiquetas</h1>
             <p style="margin: 5px 0 0 0; color: #666;">Módulo de Taller - Cat Joyas</p>
         </div>
-        <button class="btn-print" onclick="window.print()">Imprimir Etiquetas</button>
-    </div>
+        
+        <button class="btn-print" onclick="gtag('event', 'print_labels', { event_category: 'taller', event_label: 'impresion_qr' }); window.print()">Imprimir Etiquetas</button>
+        </div>
 
     <div id="loading" class="no-print">Generando códigos únicos desde el servidor...</div>
 

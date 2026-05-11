@@ -3,6 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
     <title>Bolsa de Compras | Cat Joyas</title>
     
     <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
@@ -82,6 +92,22 @@
             }
 
             window.eliminarItem = function(index) {
+                // INICIO PIEZA GA4: Eliminar del carrito
+                const itemRemovido = carrito[index];
+                if(itemRemovido) {
+                    gtag('event', 'remove_from_cart', {
+                        currency: 'CLP',
+                        value: itemRemovido.price,
+                        items: [{
+                            item_id: itemRemovido.id,
+                            item_name: itemRemovido.name,
+                            price: itemRemovido.price,
+                            quantity: 1
+                        }]
+                    });
+                }
+                // FIN PIEZA GA4
+
                 carrito.splice(index, 1);
                 localStorage.setItem('catjoyas_cart', JSON.stringify(carrito));
                 renderizarCarritoVista();
@@ -102,6 +128,19 @@
                 }
 
                 const subtotal = carrito.reduce((acc, item) => acc + item.price, 0);
+
+                // INICIO PIEZA GA4: Ver carrito
+                gtag('event', 'view_cart', {
+                    currency: 'CLP',
+                    value: subtotal,
+                    items: carrito.map(item => ({
+                        item_id: item.id,
+                        item_name: item.name,
+                        price: item.price,
+                        quantity: 1
+                    }))
+                });
+                // FIN PIEZA GA4
 
                 let html = `
                     <table class="cart-table fade-in visible">
@@ -148,11 +187,29 @@
                             <span>Subtotal</span>
                             <span>$${subtotal.toLocaleString('es-CL')}</span>
                         </div>
-                        <a href="checkout.html" class="btn-checkout">Proceder al Pago</a>
+                        <a href="checkout.html" class="btn-checkout" id="btn-proceder-pago">Proceder al Pago</a>
                     </div>
                 `;
 
                 cartContent.innerHTML = html;
+
+                // INICIO PIEZA GA4: Iniciar checkout
+                const btnProceder = document.getElementById('btn-proceder-pago');
+                if(btnProceder) {
+                    btnProceder.addEventListener('click', () => {
+                        gtag('event', 'begin_checkout', {
+                            currency: 'CLP',
+                            value: subtotal,
+                            items: carrito.map(item => ({
+                                item_id: item.id,
+                                item_name: item.name,
+                                price: item.price,
+                                quantity: 1
+                            }))
+                        });
+                    });
+                }
+                // FIN PIEZA GA4
             }
 
             renderizarCarritoVista();

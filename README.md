@@ -1,38 +1,20 @@
-Cat Joyas - E-commerce & Inventory Management
-Sistema integral para la gestión de orfebrería de autor, diseñado para Cat Joyas en Santiago de Chile. El proyecto abarca desde la experiencia de usuario en la tienda hasta herramientas administrativas de taller.
+# Cat Joyas - E-commerce y Taller Digital
 
-Arquitectura del Sistema
-Motor de Base de Datos: PostgreSQL.
+Plataforma de joyería artesanal desarrollada con un enfoque en persistencia de datos robusta, seguridad de inventario y trazabilidad de eventos.
 
-ORM: Prisma.
+## Tecnologías Utilizadas
+* **Frontend:** HTML5, CSS3, JavaScript (Vanilla).
+* **Backend:** Node.js con Express.js.
+* **Base de Datos:** PostgreSQL (Relacional).
+* **ORM:** Prisma (Object-Relational Mapping).
+* **Infraestructura:** Docker y Docker Compose para contenerización.
+* **Analítica:** Google Analytics 4 (Implementación de eventos view_item, add_to_cart y purchase).
 
-Backend: Node.js con Express.
+## Características Principales
+* **Validación de Integridad:** El servidor valida precios y existencias directamente en la base de datos antes de procesar cualquier transacción, evitando manipulaciones desde el cliente.
+* **Arquitectura Escalable:** Uso de PostgreSQL para permitir concurrencia y transacciones seguras.
+* **Entorno Contenerizado:** Configuración de Docker lista para despliegue en servicios de nube como Google Cloud Run.
+* **Gestión de Comentarios:** Sistema de reseñas con vinculación directa a productos y persistencia en base de datos.
 
-Frontend: HTML5, CSS3 y JavaScript (Vanilla).
-
-Funcionalidades de Taller: Generación dinámica de códigos QR para control de stock físico.
-
-Configuración del Entorno
-Dependencias:
-Instalar los módulos necesarios con npm install.
-
-Variables de Entorno:
-Configurar el archivo .env con la credencial DATABASE_URL.
-
-Base de Datos:
-Ejecutar las migraciones y el seed para poblar el catálogo inicial:
-
-Bash
-npx prisma migrate dev --name init
-npx prisma db seed
-Servidor:
-Iniciar el entorno local:
-
-Bash
-node server.js
-Módulos Administrativos
-El sistema cuenta con acceso para dispositivos móviles dentro de la red local para facilitar el escaneo en taller:
-
-Gestión de Etiquetas: /admin-etiquetas.html
-
-Actualización de Stock: /admin-taller.html
+## Logística y Envíos
+La plataforma integra un módulo de cotización de envíos vinculado

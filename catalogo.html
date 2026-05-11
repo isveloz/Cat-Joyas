@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo Completo | Cat Joyas</title>
     
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      // Recuerda cambiar G-XXXXXXXXXX por tu ID real
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
     <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
     
     <link rel="stylesheet" href="style.css">
@@ -96,6 +105,19 @@
                 carrito.push({ id, name, price, image });
                 localStorage.setItem('catjoyas_cart', JSON.stringify(carrito));
                 actualizarContador();
+
+                // INICIO PIEZA GA4: Evento Anadir al Carrito
+                gtag('event', 'add_to_cart', {
+                    currency: 'CLP',
+                    value: price,
+                    items: [{
+                        item_id: id,
+                        item_name: name,
+                        price: price,
+                        quantity: 1
+                    }]
+                });
+                // FIN PIEZA GA4
                 
                 // Efecto visual rápido en el botón
                 const btn = event.target;
@@ -117,6 +139,7 @@
                     return;
                 }
                 
+                // INICIO PIEZA GA4: Rastrear clic hacia la pagina de detalle dentro del enlace HTML
                 vitrina.innerHTML = productos.map(prod => `
                     <article class="product-item fade-in visible">
                         <div class="prod-media">
@@ -124,12 +147,32 @@
                         </div>
                         <div class="prod-info">
                             <span class="prod-tag">${prod.material}</span>
-                            <h4><a href="producto.html?id=${prod.id}" style="color:#000; text-decoration:none;">${prod.name}</a></h4>
+                            <h4>
+                                <a href="producto.html?id=${prod.id}" 
+                                   onclick="gtag('event', 'select_item', { items: [{ item_id: '${prod.id}', item_name: '${prod.name}', item_category: '${prod.material}' }] })" 
+                                   style="color:#000; text-decoration:none;">
+                                   ${prod.name}
+                                </a>
+                            </h4>
                             <span class="prod-price">$${prod.price.toLocaleString('es-CL')}</span>
                             <button class="btn-add-bag" onclick="agregarAlCarrito('${prod.id}', '${prod.name}', ${prod.price}, '${prod.imageUrl}')">Añadir al pedido</button>
                         </div>
                     </article>
                 `).join('');
+                // FIN PIEZA GA4
+
+                // INICIO PIEZA GA4: Evento de lista vista (Impresiones)
+                gtag('event', 'view_item_list', {
+                    item_list_id: 'catalogo_productos',
+                    item_list_name: 'Catálogo Principal',
+                    items: productos.map(p => ({
+                        item_id: p.id,
+                        item_name: p.name,
+                        item_category: p.material,
+                        price: p.price
+                    }))
+                });
+                // FIN PIEZA GA4
             }
 
             // 3. Filtrado Dinámico
@@ -147,7 +190,15 @@
 
             document.getElementById('filtros-categoria').addEventListener('click', (e) => {
                 if (e.target.classList.contains('filter-btn')) {
-                    aplicarFiltro(e.target.dataset.filter);
+                    const categoriaSeleccionada = e.target.dataset.filter;
+                    aplicarFiltro(categoriaSeleccionada);
+
+                    // INICIO PIEZA GA4: Rastrear uso de filtros
+                    gtag('event', 'filter_catalog', {
+                        event_category: 'Filtros',
+                        event_label: categoriaSeleccionada
+                    });
+                    // FIN PIEZA GA4
                 }
             });
 

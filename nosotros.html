@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Marca | Cat Joyas</title>
     
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
     <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
     
     <link rel="stylesheet" href="style.css">
@@ -67,8 +75,8 @@
                 <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 25px;">Nuestra Promesa</h2>
                 <p style="font-size: 18px; line-height: 1.8; color: #757575;">"No creamos simples accesorios. Diseñamos piezas que te acompañarán en tus momentos más importantes, joyas que heredarán las futuras generaciones manteniendo su brillo y su significado intactos."</p>
                 <div style="margin-top: 40px;">
-                    <a href="catalogo.html" class="btn-primary">Ver Colecciones</a>
-                </div>
+                    <a href="catalogo.html" class="btn-primary" onclick="gtag('event', 'select_content', { content_type: 'CTA', item_id: 'ver_colecciones_nosotros' })">Ver Colecciones</a>
+                    </div>
             </div>
         </section>
     </main>

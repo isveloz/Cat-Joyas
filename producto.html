@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle de Joya | Cat Joyas</title>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
     <style>
@@ -128,6 +137,19 @@
                 localStorage.setItem('catjoyas_cart', JSON.stringify(carrito));
                 actualizarContador();
                 
+                // INICIO PIEZA GA4: Anadir al carrito
+                gtag('event', 'add_to_cart', {
+                    currency: 'CLP',
+                    value: price,
+                    items: [{
+                        item_id: id,
+                        item_name: name,
+                        price: price,
+                        quantity: 1
+                    }]
+                });
+                // FIN PIEZA GA4
+                
                 const textoOriginal = btnElement.innerText;
                 btnElement.innerText = "¡Añadido a la Bolsa!";
                 btnElement.style.backgroundColor = "#4CAF50";
@@ -180,6 +202,19 @@
                         reviewsArea.style.display = 'block';
                         cargarResenasLista(prod.id);
                         configurarFormularioResenas(prod.id);
+
+                        // INICIO PIEZA GA4: Ver Detalle de Producto
+                        gtag('event', 'view_item', {
+                            currency: 'CLP',
+                            value: prod.price,
+                            items: [{
+                                item_id: prod.id,
+                                item_name: prod.name,
+                                item_category: prod.material,
+                                price: prod.price
+                            }]
+                        });
+                        // FIN PIEZA GA4
 
                     } else {
                         contenedor.innerHTML = '<div class="loader-detail">Producto no encontrado en el catálogo.</div>';
