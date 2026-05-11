@@ -1,0 +1,12 @@
+runtime: nodejs20
+env: flex
+
+# Configuración básica de recursos
+resources:
+  cpu: 1
+  memory_gb: 1.5
+  disk_size_gb: 10
+
+# Variables de entorno para conectar tu Postgres local (cuando esté en la nube)
+env_variables:
+  NODE_ENV: "production"
