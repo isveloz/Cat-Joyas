@@ -27,10 +27,7 @@ class AppError extends Error {
 
 // --- CONFIGURACIÓN DE INFRAESTRUCTURA Y SEGURIDAD ---
 
-const sslOptions = {
-    key: fs.readFileSync('server.key'),
-    cert: fs.readFileSync('server.cert')
-};
+const isProduction = process.env.NODE_ENV === 'production';
 
 // Matriz de Logística: Bluexpress (Tarifas E-commerce Priority para Joyería)
 const bluexpressRates = {
@@ -46,7 +43,7 @@ const bluexpressRates = {
 };
 
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' ? ['https://www.catjoyas.cl'] : '*',
+    origin: isProduction ? ['https://www.catjoyas.cl', 'https://catjoyas.cl'] : '*',
     methods: ['GET', 'POST', 'PATCH']
 }));
 app.use(express.json());
@@ -130,7 +127,6 @@ app.post('/api/reviews', catchAsync(async (req, res) => {
 // ==========================================
 
 app.post('/api/pay/initiate', catchAsync(async (req, res) => {
-    // AHORA RECIBIMOS EL CART
     const { amount, orderId, cart, customerData } = req.body;
     
     if (!cart || cart.length === 0) {
@@ -141,7 +137,6 @@ app.post('/api/pay/initiate', catchAsync(async (req, res) => {
     const sessionId = `session-${buyOrder}`;
     const returnUrl = `https://${req.get('host')}/api/pay/confirm`;
 
-    // 1. BLINDAJE: Verificar que las joyas sigan existiendo en DB
     const cartIds = cart.map(item => item.id);
     const validProducts = await prisma.product.findMany({
         where: { id: { in: cartIds } }
@@ -151,7 +146,6 @@ app.post('/api/pay/initiate', catchAsync(async (req, res) => {
         throw new AppError('Sincronización fallida. Por favor, limpia tu bolsa de compras y vuelve a agregar las joyas.', 400);
     }
 
-    // 2. Registro de la orden con items incluidos
     const orderRecord = await prisma.$transaction(async (tx) => {
         const customer = await tx.customer.upsert({
             where: { email: customerData.email },
@@ -173,7 +167,7 @@ app.post('/api/pay/initiate', catchAsync(async (req, res) => {
                 items: {
                     create: validProducts.map(p => ({
                         productId: p.id,
-                        quantity: 1, // Asumimos 1 por diseño actual
+                        quantity: 1, 
                         priceAt: p.price
                     }))
                 }
@@ -189,7 +183,6 @@ app.post('/api/pay/initiate', catchAsync(async (req, res) => {
 
     const response = await txWebpay.create(buyOrder, sessionId, amount, returnUrl);
 
-    // Guardamos el token en la orden
     await prisma.order.update({
         where: { id: orderRecord.id },
         data: { tbkToken: response.token }
@@ -215,7 +208,6 @@ app.get('/api/pay/confirm', catchAsync(async (req, res) => {
     const response = await txWebpay.commit(token);
 
     if (response.status === 'AUTHORIZED') {
-        // BLINDAJE: Descontar stock al autorizar el pago
         await prisma.$transaction(async (db) => {
             const order = await db.order.update({
                 where: { tbkToken: token },
@@ -296,11 +288,28 @@ app.use((err, req, res, next) => {
 });
 
 // ==========================================
-// 7. INICIALIZACIÓN
+// 7. INICIALIZACIÓN HÍBRIDA (PRODUCCIÓN / LOCAL)
 // ==========================================
 
-const PORT = process.env.PORT || 3000;
-https.createServer(sslOptions, app).listen(PORT, '0.0.0.0', () => {
-    process.stdout.write(`Servidor seguro Cat Joyas activo en puerto ${PORT}\n`);
-    process.stdout.write(`Integración: Webpay Plus & Bluexpress\n`);
-});
+const PORT = process.env.PORT || 8080;
+
+if (isProduction) {
+    // Entorno GCP: Cloud Run gestiona la terminación SSL
+    app.listen(PORT, '0.0.0.0', () => {
+        process.stdout.write(`Servidor Cat Joyas en Produccion (GCP) activo en puerto ${PORT}\n`);
+    });
+} else {
+    // Entorno Local: Uso de certificados manuales para HTTPS
+    try {
+        const sslOptions = {
+            key: fs.readFileSync('server.key'),
+            cert: fs.readFileSync('server.cert')
+        };
+        https.createServer(sslOptions, app).listen(PORT, '0.0.0.0', () => {
+            process.stdout.write(`Servidor seguro Cat Joyas (Local) activo en puerto ${PORT}\n`);
+            process.stdout.write(`Integración: Webpay Plus & Bluexpress\n`);
+        });
+    } catch (error) {
+        console.error("Error al cargar certificados SSL locales:", error.message);
+    }
+}
