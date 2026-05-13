@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Joya | Cat Joyas</title>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XZ5EV0D07H"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XZ5EV0D07H');
+    </script>
+    
+    <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        .product-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; margin-top: 40px; align-items: start; }
+        .product-gallery { background: #fff; padding: 40px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .product-gallery img { max-width: 100%; height: auto; object-fit: contain; max-height: 500px; }
+        .product-info .price { font-size: 1.8rem; font-weight: 700; color: #c5a059; margin: 20px 0; display: block; }
+        
+        /* SECCIÓN RESEÑAS CYBER-SOBER */
+        .reviews-section { margin-top: 80px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 40px; }
+        .review-card { background: rgba(255,255,255,0.02); padding: 25px; border-left: 3px solid #c5a059; margin-bottom: 20px; }
+        .stars { color: #c5a059; letter-spacing: 2px; margin-bottom: 10px; }
+        .review-form { background: rgba(255,255,255,0.03); padding: 30px; margin-bottom: 40px; border: 1px solid rgba(255,255,255,0.1); }
+        .form-group input, .form-group textarea, .form-group select { 
+            width: 100%; padding: 12px; background: #111; border: 1px solid #333; color: #fff; font-family: 'Lato', sans-serif; margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container header-layout">
+            <nav class="header-nav nav-left">
+                <ul class="menu-list">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="catalogo.html">Catálogo</a></li>
+                </ul>
+            </nav>
+            <div class="brand-center"><img src="img/catjoyaslogo.jpg" alt="Cat Joyas" style="max-height: 70px;"></div>
+            <nav class="header-nav nav-right">
+                <ul class="menu-list">
+                    <li><a href="contacto.html">Contacto</a></li>
+                    <li><a href="carrito.html" class="cart-btn" id="header-cart-count">BOLSA (0)</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container section-spacing">
+        <a href="catalogo.html" style="text-decoration: none; color: #888; font-size: 0.8rem;">&larr; VOLVER AL CATÁLOGO</a>
+        
+        <div id="contenedor-detalle" class="product-detail-grid">
+            <div style="grid-column: 1/-1; text-align: center; padding: 100px; color: #c5a059;">SINCRONIZANDO CON EL TALLER...</div>
+        </div>
+
+        <section class="reviews-section" id="reviews-area" style="display:none;">
+            <h2 class="text-center">Valoraciones de la Pieza</h2>
+            
+            <div class="review-form">
+                <h3>Dejar una reseña</h3>
+                <form id="form-review">
+                    <input type="text" id="rev-name" placeholder="Tu Nombre" required>
+                    <select id="rev-rating" required>
+                        <option value="5">★★★★★ - Excelente</option>
+                        <option value="4">★★★★☆ - Muy Buena</option>
+                        <option value="3">★★★☆☆ - Buena</option>
+                    </select>
+                    <textarea id="rev-comment" rows="4" placeholder="Comenta tu experiencia con esta joya..." required></textarea>
+                    <button type="submit" class="btn-primary" id="btn-submit-review">Publicar Reseña</button>
+                </form>
+            </div>
+
+            <div id="reviews-list"></div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { CatJoyasAPI } from './js/api-client.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            const contenedor = document.getElementById('contenedor-detalle');
+            const listResenas = document.getElementById('reviews-list');
+
+            // 1. Sincronizar Bolsa
+            const actualizarBolsa = () => {
+                const carrito = JSON.parse(localStorage.getItem('catjoyas_cart')) || [];
+                document.getElementById('header-cart-count').innerText = `BOLSA (${carrito.length})`;
+            };
+            actualizarBolsa();
+
+            window.agregarAlCarrito = (id, name, price, image) => {
+                let carrito = JSON.parse(localStorage.getItem('catjoyas_cart')) || [];
+                carrito.push({ id, name, price, image });
+                localStorage.setItem('catjoyas_cart', JSON.stringify(carrito));
+                actualizarBolsa();
+                alert("Pieza añadida a tu bolsa.");
+            };
+
+            // 2. Cargar Datos del Producto
+            const cargarPagina = async () => {
+                if (!productId) {
+                    contenedor.innerHTML = "ID de producto no válido.";
+                    return;
+                }
+
+                try {
+                    const prod = await CatJoyasAPI.getProductById(productId);
+                    
+                    contenedor.innerHTML = `
+                        <div class="product-gallery fade-in visible">
+                            <img src="${prod.imageUrl || 'img/18k.jpg'}" onerror="this.src='img/18k.jpg'">
+                        </div>
+                        <div class="product-info fade-in visible">
+                            <span style="color:#888; text-transform:uppercase; letter-spacing:2px;">${prod.material}</span>
+                            <h1>${prod.name}</h1>
+                            <span class="price">$${prod.price.toLocaleString('es-CL')}</span>
+                            <p>${prod.description}</p>
+                            <p style="color: ${prod.stock > 0 ? '#4CAF50' : '#ff4444'}; font-weight: bold;">
+                                ${prod.stock > 0 ? `Disponible en taller: ${prod.stock} piezas` : 'Agotado temporalmente'}
+                            </p>
+                            <button class="btn-add-large" onclick="agregarAlCarrito('${prod.id}', '${prod.name}', ${prod.price}, '${prod.imageUrl}')" ${prod.stock <= 0 ? 'disabled' : ''}>
+                                ${prod.stock > 0 ? 'Añadir al pedido' : 'Sin Stock'}
+                            </button>
+                        </div>
+                    `;
+
+                    document.getElementById('reviews-area').style.display = 'block';
+                    renderResenas(productId);
+
+                    // GA4
+                    gtag('event', 'view_item', {
+                        currency: 'CLP',
+                        value: prod.price,
+                        items: [{ item_id: prod.id, item_name: prod.name }]
+                    });
+
+                } catch (err) {
+                    contenedor.innerHTML = "Error al conectar con la base de datos.";
+                }
+            };
+
+            // 3. Lógica de Reseñas
+            const renderResenas = async (id) => {
+                try {
+                    const reviews = await CatJoyasAPI.getReviews(id);
+                    if (reviews.length === 0) {
+                        listResenas.innerHTML = "<p>Aún no hay reseñas. ¡Sé el primero!</p>";
+                        return;
+                    }
+                    listResenas.innerHTML = reviews.map(r => `
+                        <div class="review-card">
+                            <div class="stars">${'★'.repeat(r.rating)}</div>
+                            <strong>${r.authorName}</strong>
+                            <p>"${r.comment}"</p>
+                        </div>
+                    `).join('');
+                } catch (e) {
+                    listResenas.innerHTML = "Error al cargar reseñas.";
+                }
+            };
+
+            document.getElementById('form-review').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btn-submit-review');
+                btn.disabled = true;
+                btn.innerText = "Enviando...";
+
+                const data = {
+                    productId,
+                    authorName: document.getElementById('rev-name').value,
+                    rating: parseInt(document.getElementById('rev-rating').value),
+                    comment: document.getElementById('rev-comment').value
+                };
+
+                try {
+                    await CatJoyasAPI.postReview(data);
+                    e.target.reset();
+                    renderResenas(productId);
+                } catch (err) {
+                    alert("No se pudo guardar la reseña.");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = "Publicar Reseña";
+                }
+            });
+
+            cargarPagina();
+        });
+    </script>
+</body>
+</html>

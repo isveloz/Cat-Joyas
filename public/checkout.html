@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Cat Joyas</title>
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XZ5EV0D07H"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XZ5EV0D07H');
+    </script>
+
+    <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { background-color: #ffffff; color: #1a1a1a; }
+        .checkout-grid { display: grid; grid-template-columns: 3fr 2fr; gap: 40px; margin-top: 20px; }
+        .checkout-form { padding: 30px; background: #fff; border: 1px solid #eee; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; color: #000; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; font-family: 'Lato', sans-serif; background: #fff; color: #000; }
+        
+        .order-summary { padding: 30px; background: #fff; border: 2px solid #000; height: fit-content; position: sticky; top: 100px; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 0.95rem; }
+        .summary-total { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 2px solid #000; font-weight: 700; font-size: 1.2rem; }
+        
+        .btn-pay { width: 100%; padding: 18px; background: #000; color: #fff; text-transform: uppercase; border: none; font-weight: 700; margin-top: 30px; cursor: pointer; transition: 0.3s; letter-spacing: 2px; }
+        .btn-pay:hover { background: #333; }
+        
+        .cart-item { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #f5f5f5; }
+        .cart-item img { width: 55px; height: 55px; object-fit: contain; border: 1px solid #eee; }
+        .loader-text { font-size: 0.75rem; color: #c5a059; font-style: italic; display: none; margin-left: 10px; }
+        .shipping-badge { font-size: 0.65rem; background: #002d72; color: #fff; padding: 2px 6px; border-radius: 3px; vertical-align: middle; margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="container header-layout">
+            <nav class="header-nav nav-left">
+                <a href="carrito.html" style="font-size: 0.8rem; text-transform: uppercase; color: #000; text-decoration: none;">&larr; Volver</a>
+            </nav>
+            <div class="brand-center">
+                <img src="img/catjoyaslogo.jpg" alt="Cat Joyas" style="max-height: 75px;">
+            </div>
+            <nav class="header-nav nav-right"></nav>
+        </div>
+    </header>
+
+    <main class="container section-spacing">
+        <h2>Finalizar Pedido</h2>
+        
+        <div class="checkout-grid">
+            <div class="checkout-form">
+                <h3>Información de Despacho</h3>
+                <form id="form-pago">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group"><label>Nombre</label><input type="text" id="nombre" required></div>
+                        <div class="form-group"><label>Apellido</label><input type="text" id="apellido" required></div>
+                    </div>
+                    <div class="form-group">
+                        <label>Dirección</label>
+                        <input type="text" id="direccion" placeholder="Calle, Número, Depto" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Comuna <span class="shipping-badge">Bluexpress</span> <span id="loading-quote" class="loader-text">Calculando...</span></label>
+                        <input type="text" id="comuna" placeholder="Ej: Las Condes" required>
+                    </div>
+                </form>
+            </div>
+
+            <div class="order-summary">
+                <h3>Tu Bolsa</h3>
+                <div id="lista-carrito"></div>
+                
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="subtotal-pedido">$0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Envío (Bluexpress)</span>
+                    <span id="costo-envio">$0</span>
+                </div>
+                
+                <div class="summary-total">
+                    <span>Total Final</span>
+                    <span id="total-pedido">$0</span>
+                </div>
+
+                <button class="btn-pay" id="btn-submit-checkout" form="form-pago">Pagar con Webpay Plus</button>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { CatJoyasAPI } from './js/api-client.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputComuna = document.getElementById('comuna'); 
+            const spanCostoEnvio = document.getElementById('costo-envio'); 
+            const spanTotalPedido = document.getElementById('total-pedido'); 
+            const spanSubtotal = document.getElementById('subtotal-pedido');
+            const listaCarrito = document.getElementById('lista-carrito');
+            const loader = document.getElementById('loading-quote');
+            
+            let carrito = JSON.parse(localStorage.getItem('catjoyas_cart')) || [];
+            let subtotalGlobal = 0;
+            let envioGlobal = 0;
+
+            function render() {
+                if (carrito.length === 0) {
+                    listaCarrito.innerHTML = '<p>No hay joyas en tu bolsa.</p>';
+                    return;
+                }
+                subtotalGlobal = carrito.reduce((acc, i) => acc + i.price, 0);
+                listaCarrito.innerHTML = carrito.map(item => `
+                    <div class="cart-item">
+                        <img src="${item.image}" onerror="this.src='img/18k.jpg'">
+                        <div style="flex-grow:1; font-size:0.85rem;">
+                            <strong>${item.name}</strong><br>
+                            <span>$${item.price.toLocaleString('es-CL')}</span>
+                        </div>
+                    </div>
+                `).join('');
+                actualizarTotales();
+            }
+
+            function actualizarTotales() {
+                spanSubtotal.innerText = `$${subtotalGlobal.toLocaleString('es-CL')}`;
+                spanCostoEnvio.innerText = `$${envioGlobal.toLocaleString('es-CL')}`;
+                spanTotalPedido.innerText = `$${(subtotalGlobal + envioGlobal).toLocaleString('es-CL')}`;
+            }
+
+            inputComuna.addEventListener('blur', async () => {
+                const comuna = inputComuna.value.trim();
+                if (!comuna) return;
+                loader.style.display = 'inline';
+                try {
+                    const res = await CatJoyasAPI.quoteShipping(comuna);
+                    envioGlobal = res.costCLP;
+                    actualizarTotales();
+                    
+                    // Evento GA4
+                    gtag('event', 'add_shipping_info', {
+                        currency: 'CLP',
+                        value: subtotalGlobal + envioGlobal,
+                        shipping_tier: comuna,
+                        items: carrito.map(i => ({ item_id: i.id, item_name: i.name }))
+                    });
+                } finally { loader.style.display = 'none'; }
+            });
+
+            document.getElementById('form-pago').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btn-submit-checkout');
+                btn.disabled = true;
+                btn.innerText = "Conectando...";
+
+                // Construcción correcta del payload unificado
+                const payload = {
+                    orderId: `CAT-${Date.now()}`,
+                    amount: subtotalGlobal + envioGlobal,
+                    cart: carrito, // El carrito es vital para descontar stock en Prisma
+                    customerData: {
+                        email: document.getElementById('email').value,
+                        nombre: document.getElementById('nombre').value,
+                        apellido: document.getElementById('apellido').value,
+                        direccion: document.getElementById('direccion').value,
+                        comuna: document.getElementById('comuna').value
+                    }
+                };
+
+                try {
+                    // Llamada correcta pasando un único objeto
+                    const payRes = await CatJoyasAPI.initPayment(payload);
+                    window.location.href = `${payRes.url}?token_ws=${payRes.token}`;
+                } catch (err) {
+                    console.error(err);
+                    alert("Error en el proceso de pago.");
+                    btn.disabled = false;
+                    btn.innerText = "Pagar con Webpay Plus";
+                }
+            });
+
+            render();
+        });
+    </script>
+</body>
+</html>

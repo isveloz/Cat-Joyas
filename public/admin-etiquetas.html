@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XZ5EV0D07H"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XZ5EV0D07H');
+    </script>
+    <title>Etiquetas Taller | Cat Joyas</title>
+    
+    <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Estética Cyber-Sober para Pantalla (Vista de Administrador) --- */
+        body { 
+            font-family: 'Lato', sans-serif; 
+            background-color: #050505; 
+            color: #e0e0e0; 
+            padding: 20px; 
+            margin: 0;
+        }
+        .header-taller { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+            padding-bottom: 10px; 
+        }
+        .header-taller h1 { color: #c5a059; }
+        .header-taller p { color: #888; }
+        
+        .btn-print { 
+            background: transparent; 
+            color: #00d4ff; 
+            border: 1px solid #00d4ff; 
+            padding: 10px 20px; 
+            text-transform: uppercase; 
+            font-weight: bold; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            transition: all 0.3s ease;
+        }
+        .btn-print:hover { 
+            background: #00d4ff; 
+            color: #050505; 
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        }
+        
+        .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .qr-card { 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            padding: 15px; 
+            text-align: center; 
+            border-radius: 8px; 
+        }
+        .qr-card img { 
+            width: 100%; 
+            max-width: 120px; 
+            height: auto; 
+            margin-top: 10px; 
+            background: #fff; /* Fondea el QR en blanco para que sea escaneable en pantalla negra */
+            padding: 5px; 
+            border-radius: 4px; 
+        }
+        .qr-sku { font-family: monospace; font-size: 1.1rem; font-weight: bold; margin-top: 5px; color: #fff; }
+        .qr-name { font-size: 0.85rem; color: #aaa; text-transform: uppercase; }
+
+        #loading { color: #00d4ff; font-family: monospace; font-size: 1.1rem; }
+
+        /* --- Formato Estricto para Impresora Física (Ahorro de Tinta) --- */
+        @media print {
+            body { background-color: #fff; color: #000; padding: 0; }
+            .no-print { display: none !important; }
+            .qr-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-start; }
+            .qr-card { 
+                background: #fff; 
+                border: 1px dashed #000; 
+                padding: 10px; 
+                width: 150px; 
+                page-break-inside: avoid; 
+                border-radius: 0;
+            }
+            .qr-sku { color: #000; }
+            .qr-name { color: #333; }
+            .qr-card img { padding: 0; border: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-taller no-print">
+        <div>
+            <h1 style="margin: 0; text-transform: uppercase; letter-spacing: 2px;">Generador de Etiquetas</h1>
+            <p style="margin: 5px 0 0 0;">Módulo de Taller - Cat Joyas</p>
+        </div>
+        
+        <button class="btn-print" onclick="gtag('event', 'print_labels', { event_category: 'taller', event_label: 'impresion_qr' }); window.print()">Imprimir Etiquetas</button>
+    </div>
+
+    <div id="loading" class="no-print">Generando códigos únicos desde el servidor...</div>
+
+    <div class="qr-grid" id="qr-grid"></div>
+
+    <script type="module">
+        import { CatJoyasAPI } from './js/api-client.js';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const grid = document.getElementById('qr-grid');
+            const loading = document.getElementById('loading');
+
+            try {
+                // Consumo modular de la API para obtener el catálogo activo
+                const productos = await CatJoyasAPI.getProducts();
+
+                for (const prod of productos) {
+                    // Petición al endpoint de códigos QR
+                    const dataQr = await CatJoyasAPI.request(`/qr/${prod.sku}`);
+
+                    grid.innerHTML += `
+                        <div class="qr-card">
+                            <div class="qr-name">${dataQr.name}</div>
+                            <div class="qr-sku">${dataQr.sku}</div>
+                            <img src="${dataQr.qrImage}" alt="QR de ${dataQr.sku}">
+                        </div>
+                    `;
+                }
+                loading.style.display = 'none';
+            } catch (error) {
+                console.error("Error cargando etiquetas:", error);
+                loading.innerText = 'Error al conectar con la base de datos del inventario.';
+                loading.style.color = '#ff4444';
+            }
+        });
+    </script>
+</body>
+</html>

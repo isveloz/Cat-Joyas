@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Gracias por tu compra! | Cat Joyas</title>
+    
+    <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XZ5EV0D07H"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XZ5EV0D07H');
+
+      document.addEventListener('DOMContentLoaded', () => {
+          const params = new URLSearchParams(window.location.search);
+          const orderNum = params.get('orden');
+          gtag('event', 'purchase', {
+              transaction_id: orderNum || 'T_UNKNOWN',
+              value: 0.0,
+              currency: 'CLP'
+          });
+          localStorage.removeItem('catjoyas_cart');
+      });
+    </script>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #ffffff; color: #1a1a1a; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; text-align: center; }
+        .success-wrapper { max-width: 500px; padding: 40px; border: 1px solid #eee; }
+        .logo-success { max-height: 80px; margin-bottom: 30px; }
+        .check-icon { width: 60px; height: 60px; color: #4CAF50; margin-bottom: 20px; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 10px; }
+        .order-box { background: #f9f9f9; border: 1px solid #eee; padding: 20px; margin: 25px 0; font-family: monospace; font-size: 1.1rem; }
+        .shipping-note { font-size: 0.85rem; color: #666; line-height: 1.6; }
+        .btn-home { display: inline-block; margin-top: 35px; padding: 15px 35px; background: #000; color: #fff; text-decoration: none; text-transform: uppercase; font-weight: 700; font-size: 0.8rem; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+
+    <main class="success-wrapper">
+        <img src="img/catjoyaslogo.jpg" alt="Cat Joyas" class="logo-success">
+        <br>
+        <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        
+        <h1>Pago Confirmado</h1>
+        <p>Tu joya ha entrado en proceso de fabricación. Recibirás un correo con los detalles de la logística a la brevedad.</p>
+        
+        <div class="order-box">
+            <span style="font-size:0.7rem; color:#999; text-transform:uppercase;">Número de Orden</span><br>
+            <span id="display-order" style="font-weight:700;">ORD-CALC...</span>
+        </div>
+
+        <p class="shipping-note">Despacho gestionado por <strong>Bluexpress</strong>. Se notificará el código de seguimiento de 12 dígitos una vez el artesano entregue el paquete.</p>
+
+        <a href="index.html" class="btn-home">Volver al inicio</a>
+    </main>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const orderNum = params.get('orden');
+        if (orderNum) document.getElementById('display-order').innerText = orderNum;
+    </script>
+</body>
+</html>

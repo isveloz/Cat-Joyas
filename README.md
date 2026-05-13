@@ -1,20 +1,45 @@
-# Cat Joyas - E-commerce y Taller Digital
+# Cat Joyas - E-commerce
 
-Plataforma de joyería artesanal desarrollada con un enfoque en persistencia de datos robusta, seguridad de inventario y trazabilidad de eventos.
+Plataforma web para la comercialización de joyería de alta gama, equipada con un motor transaccional completo, gestión de inventario y pasarela de pagos integrada.
 
-## Tecnologías Utilizadas
-* **Frontend:** HTML5, CSS3, JavaScript (Vanilla).
-* **Backend:** Node.js con Express.js.
-* **Base de Datos:** PostgreSQL (Relacional).
-* **ORM:** Prisma (Object-Relational Mapping).
-* **Infraestructura:** Docker y Docker Compose para contenerización.
-* **Analítica:** Google Analytics 4 (Implementación de eventos view_item, add_to_cart y purchase).
+## Stack Tecnológico
 
-## Características Principales
-* **Validación de Integridad:** El servidor valida precios y existencias directamente en la base de datos antes de procesar cualquier transacción, evitando manipulaciones desde el cliente.
-* **Arquitectura Escalable:** Uso de PostgreSQL para permitir concurrencia y transacciones seguras.
-* **Entorno Contenerizado:** Configuración de Docker lista para despliegue en servicios de nube como Google Cloud Run.
-* **Gestión de Comentarios:** Sistema de reseñas con vinculación directa a productos y persistencia en base de datos.
+* Backend: Node.js y Express
+* Base de Datos: PostgreSQL gestionada con Prisma ORM
+* Pasarela de Pagos: Transbank Webpay Plus (Ambiente de Integración)
+* Logística: Matriz de costos optimizada para Bluexpress
+* Seguridad: Comunicaciones bajo protocolo HTTPS y certificados SSL
+* Analítica: Google Analytics 4 (GA4)
 
-## Logística y Envíos
-La plataforma integra un módulo de cotización de envíos vinculado
+## Instalación y Configuración Local
+
+1. Clonar el repositorio:
+   ```bash
+   git clone [https://github.com/isveloz/Cat-Joyas.git](https://github.com/isveloz/Cat-Joyas.git)
+
+2. Instalar las dependencias del proyecto:
+npm install
+
+3. Configurar variables de entorno:
+Crear un archivo .env en la raíz del proyecto con el siguiente formato 
+
+DATABASE_URL="postgresql://usuario:contraseña@localhost:5432/cat_joyas"
+PORT=3000
+
+4. Sincronizar la base de datos e iniciar el servidor:
+
+npx prisma generate
+npx prisma db push
+node server.js
+
+
+**Tareas Pendientes (To-Do)**
+1. Infraestructura: Migrar la base de datos de entorno local a la nube utilizando Neon.tech o Supabase.
+
+2. Despliegue: Configurar la implementación continua (CI/CD) y lanzar el servicio en Google Cloud Run.
+
+3. Logística: Integrar la API oficial de Bluexpress para generación automatizada de etiquetas (requiere cuenta comercial).
+
+4. Administración: Desarrollar el panel de control para actualización de stock y generación de códigos QR desde el frontend.
+
+**Desarrollado por isveloz**

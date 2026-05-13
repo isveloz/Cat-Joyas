@@ -5,23 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo Completo | Cat Joyas</title>
     
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XZ5EV0D07H"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
-      // Recuerda cambiar G-XXXXXXXXXX por tu ID real
-      gtag('config', 'G-XXXXXXXXXX');
+      gtag('config', 'G-XZ5EV0D07H');
     </script>
+
     <link rel="icon" type="image/jpeg" href="img/catjoyaslogo.jpg">
     
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@100;300;400;700&display=swap" rel="stylesheet">
+    
     <style>
         .filter-bar { display: flex; justify-content: center; gap: 20px; margin-bottom: 40px; }
-        .filter-btn { background: none; border: 1px solid #ccc; padding: 8px 20px; cursor: pointer; font-family: 'Lato', sans-serif; text-transform: uppercase; font-size: 0.85rem; transition: all 0.3s; }
-        .filter-btn:hover, .filter-btn.active { background: #000; color: #fff; border-color: #000; }
+        .filter-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 20px; cursor: pointer; font-family: 'Lato', sans-serif; text-transform: uppercase; font-size: 0.85rem; transition: all 0.3s; }
+        .filter-btn:hover, .filter-btn.active { background: #c5a059; color: #050505; border-color: #c5a059; box-shadow: 0 0 15px rgba(197, 160, 89, 0.3); }
     </style>
 </head>
 <body>
@@ -57,9 +57,9 @@
     </header>
 
     <main id="main-content" class="section-spacing">
-        <div class="container text-center fade-in">
+        <div class="container text-center fade-in visible">
             <h2>Colección Completa</h2>
-            <p style="margin-bottom: 30px;">Piezas exclusivas forjadas a mano en nuestro taller.</p>
+            <p style="margin-bottom: 30px; color: #888;">Piezas exclusivas forjadas a mano en nuestro taller.</p>
             
             <div class="filter-bar" id="filtros-categoria">
                 <button class="filter-btn active" data-filter="todos">Todo</button>
@@ -72,7 +72,9 @@
         <section class="product-showcase">
             <div class="container">
                 <div id="vitrina-productos" class="product-matrix">
-                    <p style="text-align: center; width: 100%; grid-column: 1 / -1;">Cargando inventario...</p>
+                    <p style="text-align: center; width: 100%; grid-column: 1 / -1; color: #c5a059; font-family: monospace; letter-spacing: 2px;">
+                        ESTABLECIENDO CONEXIÓN CON EL INVENTARIO...
+                    </p>
                 </div>
             </div>
         </section>
@@ -87,134 +89,112 @@
         </div>
     </footer>
 
-    <script>
+    <script type="module">
+        import { CatJoyasAPI } from './js/api-client.js';
+
         document.addEventListener('DOMContentLoaded', () => {
             const vitrina = document.getElementById('vitrina-productos');
             const cartCountEl = document.getElementById('header-cart-count');
             let productosGlobales = [];
 
-            // 1. Lógica del Carrito (LocalStorage)
-            let carrito = JSON.parse(localStorage.getItem('catjoyas_cart')) || [];
-            
-            function actualizarContador() {
-                cartCountEl.innerText = `BOLSA (${carrito.length})`;
-            }
+            // 1. Sincronización del Carrito
+            const actualizarContador = () => {
+                let carrito = JSON.parse(localStorage.getItem('catjoyas_cart')) || [];
+                if(cartCountEl) cartCountEl.innerText = `BOLSA (${carrito.length})`;
+            };
             actualizarContador();
 
             window.agregarAlCarrito = function(id, name, price, image) {
+                let carrito = JSON.parse(localStorage.getItem('catjoyas_cart')) || [];
                 carrito.push({ id, name, price, image });
                 localStorage.setItem('catjoyas_cart', JSON.stringify(carrito));
                 actualizarContador();
 
-                // INICIO PIEZA GA4: Evento Anadir al Carrito
+                // Telemetría GA4
                 gtag('event', 'add_to_cart', {
                     currency: 'CLP',
                     value: price,
-                    items: [{
-                        item_id: id,
-                        item_name: name,
-                        price: price,
-                        quantity: 1
-                    }]
+                    items: [{ item_id: id, item_name: name, price: price, quantity: 1 }]
                 });
-                // FIN PIEZA GA4
                 
-                // Efecto visual rápido en el botón
-                const btn = event.target;
-                const textoOriginal = btn.innerText;
-                btn.innerText = "¡Añadido!";
-                btn.style.backgroundColor = "#4CAF50";
-                btn.style.color = "white";
-                setTimeout(() => {
-                    btn.innerText = textoOriginal;
-                    btn.style.backgroundColor = "";
-                    btn.style.color = "";
-                }, 1000);
+                // Feedback visual en el botón (opcional, podrías añadir un toast aquí)
+                alert(`${name} añadido a la bolsa.`);
             };
 
-            // 2. Renderizado de Productos
+            // 2. Motor de Renderizado (Con Fallback de imagen)
             function renderizarProductos(productos) {
                 if (productos.length === 0) {
-                    vitrina.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">No hay productos en esta categoría.</p>';
+                    vitrina.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">No hay piezas disponibles en esta categoría.</p>';
                     return;
                 }
                 
-                // INICIO PIEZA GA4: Rastrear clic hacia la pagina de detalle dentro del enlace HTML
                 vitrina.innerHTML = productos.map(prod => `
                     <article class="product-item fade-in visible">
                         <div class="prod-media">
-                            <img src="${prod.imageUrl}" alt="${prod.name}" style="object-fit: contain; background: #fff;">
+                            <img src="${prod.imageUrl || 'img/18k.jpg'}" 
+                                 alt="${prod.name}" 
+                                 onerror="this.src='img/18k.jpg'"
+                                 style="object-fit: contain; background: #fff;">
                         </div>
                         <div class="prod-info">
-                            <span class="prod-tag">${prod.material}</span>
+                            <span class="prod-tag">${prod.material || 'Orfebrería'}</span>
                             <h4>
                                 <a href="producto.html?id=${prod.id}" 
-                                   onclick="gtag('event', 'select_item', { items: [{ item_id: '${prod.id}', item_name: '${prod.name}', item_category: '${prod.material}' }] })" 
-                                   style="color:#000; text-decoration:none;">
+                                   onclick="gtag('event', 'select_item', { items: [{ item_id: '${prod.id}', item_name: '${prod.name}' }] })" 
+                                   style="color:inherit; text-decoration:none;">
                                    ${prod.name}
                                 </a>
                             </h4>
                             <span class="prod-price">$${prod.price.toLocaleString('es-CL')}</span>
-                            <button class="btn-add-bag" onclick="agregarAlCarrito('${prod.id}', '${prod.name}', ${prod.price}, '${prod.imageUrl}')">Añadir al pedido</button>
+                            <button class="btn-add-bag" onclick="agregarAlCarrito('${prod.id}', '${prod.name}', ${prod.price}, '${prod.imageUrl || 'img/18k.jpg'}')">
+                                Añadir al pedido
+                            </button>
                         </div>
                     </article>
                 `).join('');
-                // FIN PIEZA GA4
 
-                // INICIO PIEZA GA4: Evento de lista vista (Impresiones)
+                // Log GA4: Vista de lista
                 gtag('event', 'view_item_list', {
-                    item_list_id: 'catalogo_productos',
                     item_list_name: 'Catálogo Principal',
-                    items: productos.map(p => ({
-                        item_id: p.id,
-                        item_name: p.name,
-                        item_category: p.material,
-                        price: p.price
-                    }))
+                    items: productos.map(p => ({ item_id: p.id, item_name: p.name, price: p.price }))
                 });
-                // FIN PIEZA GA4
             }
 
-            // 3. Filtrado Dinámico
+            // 3. Sistema de Filtros
             function aplicarFiltro(categoria) {
                 document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
                 document.querySelector(`.filter-btn[data-filter="${categoria}"]`)?.classList.add('active');
 
-                if (categoria === 'todos') {
-                    renderizarProductos(productosGlobales);
-                } else {
-                    const filtrados = productosGlobales.filter(p => p.material.toLowerCase().includes(categoria));
-                    renderizarProductos(filtrados);
-                }
+                const filtrados = (categoria === 'todos') 
+                    ? productosGlobales 
+                    : productosGlobales.filter(p => p.material && p.material.toLowerCase().includes(categoria.toLowerCase()));
+                
+                renderizarProductos(filtrados);
+                
+                gtag('event', 'filter_catalog', { event_label: categoria });
             }
 
             document.getElementById('filtros-categoria').addEventListener('click', (e) => {
                 if (e.target.classList.contains('filter-btn')) {
-                    const categoriaSeleccionada = e.target.dataset.filter;
-                    aplicarFiltro(categoriaSeleccionada);
-
-                    // INICIO PIEZA GA4: Rastrear uso de filtros
-                    gtag('event', 'filter_catalog', {
-                        event_category: 'Filtros',
-                        event_label: categoriaSeleccionada
-                    });
-                    // FIN PIEZA GA4
+                    aplicarFiltro(e.target.dataset.filter);
                 }
             });
 
-            // 4. Obtener datos del Backend
+            // 4. Ingesta de Datos (Uso de CatJoyasAPI)
             async function cargarCatalogo() {
                 try {
-                    const response = await fetch('http://localhost:3000/api/products');
-                    productosGlobales = await response.json();
+                    // Usamos el método estático de la clase mejorada
+                    productosGlobales = await CatJoyasAPI.getProducts();
                     
-                    // Revisar si viene un filtro desde el index.html (ej: catalogo.html?cat=oro)
                     const urlParams = new URLSearchParams(window.location.search);
                     const filtroInicial = urlParams.get('cat') || 'todos';
-                    
                     aplicarFiltro(filtroInicial);
+
                 } catch (error) {
-                    vitrina.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: red;">Error al conectar con el servidor.</p>';
+                    console.error("Error crítico de inventario:", error);
+                    vitrina.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #ff4444; font-family: monospace;">
+                        ERROR DE SINCRONIZACIÓN: Revisa la conexión con la base de datos.
+                    </p>`;
                 }
             }
 
